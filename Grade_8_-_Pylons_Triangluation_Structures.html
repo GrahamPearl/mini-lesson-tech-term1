@@ -1,0 +1,3639 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="tool">
+  <meta name="design-style" content="bauhaus">
+  <title>Triangulation &amp; Frame Structures Lab — Grade 8 Technology</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Inter:wght@100..900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@1.43.0/dist/umd/lucide.min.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
+
+      /* 1. Bauhaus style tokens */
+      --background: #f5f0e8;
+      --surface-container-low: #f2ede5;
+      --surface-container: #eee9e0;
+      --surface-container-high: #e8e3da;
+
+      --on-surface: #1a1a1a;
+      --on-surface-variant: #4a4a4a;
+
+      --outline: #1a1a1a;
+      --outline-variant: #d0cbc3;
+
+      --primary: #1a1a1a;
+      --on-primary: #ffffff;
+      --primary-container: #ffcc00;
+      --on-primary-container: #1a1a1a;
+      --secondary: #e63b2e;
+      --tertiary: #0055ff;
+      --on-tertiary: #ffffff;
+      --error: #cc0000;
+      --on-error: #ffffff;
+
+      --data-1: #e63b2e;
+      --data-2: #0055ff;
+      --data-3: #1a1a1a;
+      --data-4: #9a7300;
+      --data-context: #b5afa5;
+
+      --font-headline: 'Space Grotesk', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-label: 'Space Grotesk', sans-serif;
+
+      --rounded: 0.125rem;
+      --rounded-lg: 0.25rem;
+      --rounded-full: 0.75rem;
+
+      --border-thick: 3px solid var(--outline);
+      --border-medium: 2px solid var(--outline);
+      --border-light: 1px solid var(--outline-variant);
+      --offset-shadow: 5px 5px 0 var(--outline);
+      --offset-shadow-sm: 3px 3px 0 var(--outline);
+      --rule-heavy: 6px solid var(--outline);
+
+      /* 3. Shared semantic, focus, type, spacing & motion tokens */
+      --positive: #136f3a;
+      --on-positive: #ffffff;
+      --warning: #8a5a00;
+      --focus: #0055ff;
+      --canvas-bg: #faf7f2;
+      --canvas-grid: #e3ddd3;
+      --canvas-ground: #dcd5c9;
+      --canvas-neutral-beam: #5c5852;
+
+      --display-size: clamp(1.85rem, 1.4rem + 1.6vw, 2.75rem);
+      --headline-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.6rem);
+      --subhead-size: clamp(1.0625rem, 1rem + 0.25vw, 1.2rem);
+      --body-size: clamp(0.9375rem, 0.9rem + 0.15vw, 1rem);
+      --label-size: 0.75rem;
+
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+      --space-3xl: 6rem;
+
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --dur-micro: 120ms;
+      --dur-short: 220ms;
+      --dur-long: 420ms;
+    }
+
+    /* Base reset */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      overflow-x: clip;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    header { position: static !important; }
+
+    button, input, select {
+      font-family: inherit;
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .page-grid {
+      display: grid;
+      gap: var(--space-lg);
+      padding: var(--space-lg);
+      max-width: 1360px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .page-grid * { min-width: 0; }
+
+    /* Typography helpers */
+    .kicker {
+      display: inline-block;
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      background: var(--primary);
+      color: var(--on-primary);
+      padding: var(--space-xs) var(--space-sm);
+    }
+    .kicker-blue {
+      background: var(--tertiary);
+      color: var(--on-tertiary);
+    }
+    .kicker-yellow {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      border: var(--border-medium);
+    }
+
+    .title {
+      font-family: var(--font-headline);
+      font-weight: 700;
+      font-size: var(--display-size);
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+      color: var(--on-surface);
+      margin: var(--space-sm) 0 var(--space-sm) 0;
+    }
+    .title mark {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      padding-inline: var(--space-xs);
+      box-decoration-break: clone;
+    }
+
+    .lede {
+      font-size: var(--subhead-size);
+      color: var(--on-surface-variant);
+      max-width: 72ch;
+      margin: 0;
+    }
+
+    h2 {
+      font-family: var(--font-headline);
+      font-weight: 700;
+      font-size: var(--headline-size);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin: 0 0 var(--space-sm) 0;
+      color: var(--on-surface);
+    }
+
+    h3 {
+      font-family: var(--font-headline);
+      font-weight: 700;
+      font-size: var(--subhead-size);
+      line-height: 1.2;
+      margin: 0 0 var(--space-xs) 0;
+      color: var(--on-surface);
+    }
+
+    .label-caps {
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--on-surface-variant);
+    }
+
+    .tabular {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Bauhaus Header */
+    .masthead {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--space-lg);
+      align-items: end;
+      border-bottom: var(--rule-heavy);
+      padding-bottom: var(--space-lg);
+    }
+    .masthead-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: var(--space-sm);
+    }
+    .save-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: var(--space-xs) var(--space-sm);
+      border: var(--border-medium);
+      background: var(--surface-container-low);
+      color: var(--on-surface);
+    }
+
+    /* Preset Strip */
+    .preset-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      align-items: center;
+    }
+
+    /* Bauhaus Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-md);
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border: var(--border-thick);
+      border-radius: var(--rounded);
+      box-shadow: var(--offset-shadow-sm);
+      background: var(--surface-container-low);
+      color: var(--on-surface);
+      cursor: pointer;
+      transition: transform var(--dur-micro) var(--ease-out),
+                  box-shadow var(--dur-micro) var(--ease-out),
+                  background-color var(--dur-micro) var(--ease-out),
+                  color var(--dur-micro) var(--ease-out);
+      white-space: nowrap;
+    }
+    .btn:hover:not(:disabled) {
+      background: var(--primary);
+      color: var(--on-primary);
+      transform: translate(-1px, -1px);
+    }
+    .btn:active:not(:disabled) {
+      transform: translate(3px, 3px);
+      box-shadow: none;
+    }
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .btn-primary {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: var(--primary);
+      color: var(--on-primary);
+    }
+    .btn-blue {
+      background: var(--tertiary);
+      color: var(--on-tertiary);
+    }
+    .btn-blue:hover:not(:disabled) {
+      background: var(--primary);
+      color: var(--on-primary);
+    }
+    .btn-active {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+    .btn-sm {
+      min-height: 40px;
+      padding: var(--space-xs) var(--space-sm);
+    }
+
+    /* Primary Workbench Layout (Asymmetric 2:1) */
+    .workbench {
+      display: grid;
+      grid-template-columns: minmax(0, 1.95fr) minmax(320px, 1fr);
+      gap: var(--space-lg);
+      align-items: start;
+    }
+
+    .block {
+      border: var(--border-thick);
+      border-radius: var(--rounded);
+      box-shadow: var(--offset-shadow);
+      background: var(--surface-container-low);
+      padding: var(--space-md);
+    }
+
+    /* Canvas Panel */
+    .stage-panel {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: var(--border-thick);
+      padding-bottom: var(--space-md);
+    }
+    .tool-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      align-items: center;
+    }
+
+    .canvas-shell {
+      position: relative;
+      border: var(--border-thick);
+      background: var(--canvas-bg);
+      min-height: 520px;
+      height: 540px;
+      overflow: hidden;
+    }
+    #sim-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: crosshair;
+      touch-action: none;
+    }
+
+    .canvas-hud-top {
+      position: absolute;
+      top: var(--space-sm);
+      left: var(--space-sm);
+      right: var(--space-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--space-sm);
+      pointer-events: none;
+    }
+    .hud-chip {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      padding: var(--space-xs) var(--space-sm);
+      border: var(--border-medium);
+      background: var(--surface-container-low);
+      color: var(--on-surface);
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .hud-chip-live {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+    .hud-chip-fail {
+      background: var(--error);
+      color: var(--on-error);
+    }
+    .hud-chip-ok {
+      background: var(--positive);
+      color: var(--on-positive);
+    }
+
+    .canvas-toast {
+      position: absolute;
+      bottom: var(--space-sm);
+      left: var(--space-sm);
+      max-width: calc(100% - var(--space-lg));
+      padding: var(--space-xs) var(--space-sm);
+      border: var(--border-medium);
+      background: var(--primary);
+      color: var(--on-primary);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      pointer-events: none;
+    }
+
+    /* Display options & Legend strip */
+    .stage-footer {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--space-md);
+      align-items: center;
+      padding-top: var(--space-xs);
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      align-items: center;
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--on-surface);
+    }
+    .swatch {
+      width: 18px;
+      height: 12px;
+      border: var(--border-medium);
+      flex-shrink: 0;
+    }
+    .swatch-red { background: var(--data-1); }
+    .swatch-blue { background: var(--data-2); }
+    .swatch-neutral { background: var(--canvas-neutral-beam); }
+    .swatch-yellow { background: var(--primary-container); }
+
+    .toggle-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      align-items: center;
+    }
+    .check-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-sm);
+      border: var(--border-medium);
+      background: var(--surface-container);
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+    }
+    .check-pill input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    /* Right Telemetry & Controls Column */
+    .rail-stack {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg);
+    }
+
+    .verdict-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-sm);
+      border-bottom: var(--border-thick);
+      padding-bottom: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+    .status-stamp {
+      display: inline-block;
+      padding: var(--space-xs) var(--space-sm);
+      border: var(--border-medium);
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .status-stable {
+      background: var(--positive);
+      color: var(--on-positive);
+    }
+    .status-warn {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+    .status-fail {
+      background: var(--error);
+      color: var(--on-error);
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+    .kpi-tile {
+      border: var(--border-medium);
+      background: var(--background);
+      padding: var(--space-sm);
+    }
+    .kpi-value {
+      font-family: var(--font-headline);
+      font-weight: 700;
+      font-size: 1.5rem;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-top: var(--space-xs);
+    }
+
+    .failure-strip {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-xs);
+    }
+    .fail-badge {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-xs) var(--space-sm);
+      border: var(--border-medium);
+      background: var(--surface-container);
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--on-surface-variant);
+    }
+    .fail-badge.is-tripped {
+      background: var(--error);
+      color: var(--on-error);
+    }
+
+    /* Controls Panel */
+    .control-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+    .control-field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .control-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 84px;
+      gap: var(--space-sm);
+      align-items: end;
+    }
+    .control-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: var(--space-sm);
+    }
+    label {
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--on-surface);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 40px;
+      margin: 0;
+      accent-color: var(--tertiary);
+      cursor: pointer;
+    }
+    input[type="number"], select {
+      height: 40px;
+      width: 100%;
+      padding: 0 var(--space-sm);
+      border: 0;
+      border-bottom: var(--border-thick);
+      background: var(--surface-container);
+      color: var(--on-surface);
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: var(--body-size);
+      border-radius: 0;
+    }
+    select {
+      padding-right: var(--space-lg);
+      cursor: pointer;
+    }
+    input[type="number"]:focus, select:focus {
+      border-bottom-color: var(--tertiary);
+    }
+
+    .dual-select-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-sm);
+    }
+
+    /* Inspector Panel */
+    .inspector-box {
+      border: var(--border-medium);
+      background: var(--background);
+      padding: var(--space-sm);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+    .math-equation {
+      border-left: var(--rule-heavy);
+      background: var(--surface-container);
+      padding: var(--space-sm);
+      font-family: var(--font-label);
+      font-size: 0.85rem;
+      font-weight: 600;
+      line-height: 1.45;
+    }
+    .inspector-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-sm);
+    }
+    .inspector-stat {
+      border-top: var(--border-medium);
+      padding-top: var(--space-xs);
+    }
+    .inspector-stat-val {
+      font-family: var(--font-headline);
+      font-weight: 700;
+      font-size: 1.15rem;
+    }
+
+    /* Section Openings */
+    .section-open {
+      --accent: var(--tertiary);
+      border-top: var(--space-sm) solid var(--accent);
+      padding-top: var(--space-lg);
+      margin-top: var(--space-md);
+    }
+    .section-open-red { --accent: var(--secondary); }
+    .section-open-yellow { --accent: var(--primary-container); }
+    .section-open-black { --accent: var(--primary); }
+
+    .section-header-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: var(--space-md);
+      margin-bottom: var(--space-md);
+    }
+
+    /* Table */
+    .table-wrap {
+      overflow-x: auto;
+      border: var(--border-thick);
+      background: var(--surface-container-low);
+      box-shadow: var(--offset-shadow);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th {
+      background: var(--surface-container-high);
+      border-bottom: var(--border-thick);
+      padding: var(--space-sm) var(--space-md);
+      text-align: left;
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--on-surface);
+      white-space: nowrap;
+    }
+    td {
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: var(--border-light);
+      vertical-align: middle;
+    }
+    th.num, td.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    tbody tr {
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out);
+    }
+    tbody tr:hover {
+      background: var(--surface-container-high);
+    }
+    tbody tr.row-selected {
+      background: var(--primary-container);
+    }
+
+    .role-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      padding: 2px var(--space-xs);
+      border: var(--border-medium);
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      background: var(--background);
+      color: var(--on-surface);
+    }
+
+    /* Challenges Grid */
+    .challenge-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(270px, 100%), 1fr));
+      gap: var(--space-lg);
+    }
+    .challenge-card {
+      border: var(--border-thick);
+      box-shadow: var(--offset-shadow);
+      background: var(--surface-container-low);
+      padding: var(--space-md);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: var(--space-md);
+    }
+    .challenge-card.is-complete {
+      background: var(--primary-container);
+    }
+    .challenge-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    /* Reference Cards */
+    .ref-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+      gap: var(--space-lg);
+    }
+    .ref-card {
+      border: var(--border-thick);
+      box-shadow: var(--offset-shadow);
+      background: var(--surface-container-low);
+      padding: var(--space-md);
+    }
+    .ref-accent-bar {
+      height: 8px;
+      width: 100%;
+      margin-bottom: var(--space-sm);
+      border: var(--border-medium);
+    }
+    .ref-bar-red { background: var(--secondary); }
+    .ref-bar-blue { background: var(--tertiary); }
+    .ref-bar-yellow { background: var(--primary-container); }
+    .ref-bar-black { background: var(--primary); }
+
+    .site-footer {
+      border-top: var(--rule-heavy);
+      padding-top: var(--space-md);
+      padding-bottom: var(--space-xl);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: var(--space-md);
+      color: var(--on-surface-variant);
+      font-size: 0.875rem;
+    }
+
+    /* Container queries for rail cards */
+    .card-wrapper { container-type: inline-size; }
+    @container (max-width: 340px) {
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .dual-select-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Responsive breakpoints */
+    @media (max-width: 980px) {
+      .workbench {
+        grid-template-columns: 1fr;
+      }
+      .masthead {
+        grid-template-columns: 1fr;
+      }
+      .masthead-meta {
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page-grid {
+        padding: var(--space-sm);
+        gap: var(--space-md);
+      }
+      .canvas-shell {
+        min-height: 400px;
+        height: 420px;
+      }
+      .stage-footer {
+        grid-template-columns: 1fr;
+      }
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+      .failure-strip {
+        grid-template-columns: 1fr;
+      }
+      .control-row {
+        grid-template-columns: minmax(0, 1fr) 72px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-grid">
+
+    <!-- MASTHEAD -->
+    <header class="masthead">
+      <div>
+        <span class="kicker">Grade 8 Technology · Frame Structures</span>
+        <h1 class="title">Triangulation &amp; <mark>Structural Integrity</mark> Lab</h1>
+        <p class="lede">Place joints, construct steel beams, and test frame structures under gravity and wind. Inspect how diagonal triangulation converts bending into red compression struts and blue tension ties — and observe buckling, flexing, fracture, and toppling over when bracing fails.</p>
+      </div>
+      <div class="masthead-meta">
+        <div class="save-pill" id="save-status">
+          <i data-lucide="save" width="14" height="14" aria-hidden="true"></i>
+          <span>Workspace Ready</span>
+        </div>
+        <div class="tool-group">
+          <button type="button" class="btn btn-sm" onclick="exportStructureCsv()">
+            <i data-lucide="download" width="15" height="15" aria-hidden="true"></i>
+            Export Stress CSV
+          </button>
+          <button type="button" class="btn btn-sm" id="btn-reset-all" onclick="resetAllProgress(this)">
+            <i data-lucide="rotate-ccw" width="15" height="15" aria-hidden="true"></i>
+            Reset Lab
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- PRESET BAR -->
+    <section aria-label="Structure presets">
+      <div class="preset-strip" id="preset-strip">
+        <span class="label-caps">Presets:</span>
+        <button type="button" class="btn btn-sm btn-active" data-preset="water-tower" onclick="loadPreset('water-tower')">1. Water Tower</button>
+        <button type="button" class="btn btn-sm" data-preset="unbraced-square" onclick="loadPreset('unbraced-square')">2. Unbraced Square</button>
+        <button type="button" class="btn btn-sm" data-preset="warren-bridge" onclick="loadPreset('warren-bridge')">3. Truss Bridge</button>
+        <button type="button" class="btn btn-sm" data-preset="electrical-pylon" onclick="loadPreset('electrical-pylon')">4. Electrical Pylon</button>
+        <button type="button" class="btn btn-sm" data-preset="king-post-truss" onclick="loadPreset('king-post-truss')">5. King Post Roof Truss</button>
+        <button type="button" class="btn btn-sm" data-preset="narrow-topple" onclick="loadPreset('narrow-topple')">6. Narrow Tower (Topple)</button>
+        <button type="button" class="btn btn-sm" data-preset="blank" onclick="loadPreset('blank')">7. Blank Grid</button>
+      </div>
+    </section>
+
+    <!-- PRIMARY WORKBENCH -->
+    <main class="workbench">
+
+      <!-- LEFT: INTERACTIVE SIMULATION STAGE -->
+      <section class="block stage-panel" aria-label="Interactive structural simulation canvas">
+        <div class="toolbar">
+          <div class="tool-group" role="group" aria-label="Construction tools">
+            <button type="button" class="btn btn-sm btn-active" id="tool-select" onclick="setTool('select')">
+              <i data-lucide="mouse-pointer" width="15" height="15" aria-hidden="true"></i>
+              Inspect
+            </button>
+            <button type="button" class="btn btn-sm" id="tool-node" onclick="setTool('node')">
+              <i data-lucide="plus-circle" width="15" height="15" aria-hidden="true"></i>
+              Place Node
+            </button>
+            <button type="button" class="btn btn-sm" id="tool-beam" onclick="setTool('beam')">
+              <i data-lucide="minus" width="15" height="15" aria-hidden="true"></i>
+              Build Beam
+            </button>
+            <button type="button" class="btn btn-sm" id="tool-load" onclick="setTool('load')">
+              <i data-lucide="arrow-down-circle" width="15" height="15" aria-hidden="true"></i>
+              Add Load
+            </button>
+            <button type="button" class="btn btn-sm" id="tool-erase" onclick="setTool('erase')">
+              <i data-lucide="trash-2" width="15" height="15" aria-hidden="true"></i>
+              Erase
+            </button>
+          </div>
+
+          <div class="tool-group">
+            <button type="button" class="btn btn-sm" id="btn-undo" onclick="undoAction()" disabled>
+              <i data-lucide="undo-2" width="15" height="15" aria-hidden="true"></i>
+              Undo
+            </button>
+            <button type="button" class="btn btn-sm" onclick="resetDeformation()">
+              <i data-lucide="refresh-cw" width="15" height="15" aria-hidden="true"></i>
+              Rebuild
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" id="btn-toggle-sim" onclick="toggleSimulation()">
+              <i data-lucide="pause" width="15" height="15" aria-hidden="true"></i>
+              <span id="sim-btn-text">Pause Physics</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="canvas-shell" id="canvas-shell">
+          <canvas id="sim-canvas" aria-label="2D frame structure physics simulation"></canvas>
+          <div class="canvas-hud-top">
+            <div class="hud-chip hud-chip-live" id="hud-mode-chip">LIVE PHYSICS · 1.0G</div>
+            <div class="hud-chip" id="hud-triangles-chip">TRIANGLES: 0 · BASE: 5.0 m</div>
+          </div>
+          <div class="canvas-toast" id="canvas-toast">Click any beam or joint to inspect forces and angle stress.</div>
+        </div>
+
+        <div class="stage-footer">
+          <div class="legend-row" aria-label="Force colour legend">
+            <span class="legend-item"><span class="swatch swatch-red" aria-hidden="true"></span> Compression (Strut)</span>
+            <span class="legend-item"><span class="swatch swatch-blue" aria-hidden="true"></span> Tension (Tie)</span>
+            <span class="legend-item"><span class="swatch swatch-neutral" aria-hidden="true"></span> Neutral / Redundant</span>
+            <span class="legend-item"><span class="swatch swatch-yellow" aria-hidden="true"></span> CoG Plumb Line</span>
+          </div>
+
+          <div class="toggle-row">
+            <label class="check-pill">
+              <input type="checkbox" id="chk-angles" checked onchange="toggleOverlay('angles', this.checked)">
+              Angles
+            </label>
+            <label class="check-pill">
+              <input type="checkbox" id="chk-arrows" checked onchange="toggleOverlay('arrows', this.checked)">
+              Force Arrows
+            </label>
+            <label class="check-pill">
+              <input type="checkbox" id="chk-cog" checked onchange="toggleOverlay('cog', this.checked)">
+              CoG Line
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: TELEMETRY, PHYSICS CONTROLS & ANGLE MATH -->
+      <aside class="rail-stack" aria-label="Structural telemetry and physics controls">
+
+        <!-- 1. VERDICT & FAILURE MODES -->
+        <section class="block card-wrapper">
+          <div class="verdict-header">
+            <div>
+              <span class="label-caps">Structural Verdict</span>
+              <h2 id="verdict-title" style="margin: 0;">Triangulated &amp; Stable</h2>
+            </div>
+            <span class="status-stamp status-stable" id="verdict-badge">STABLE</span>
+          </div>
+
+          <div class="kpi-grid">
+            <div class="kpi-tile">
+              <div class="label-caps">Peak Stress</div>
+              <div class="kpi-value tabular" id="kpi-peak-stress">0%</div>
+            </div>
+            <div class="kpi-tile">
+              <div class="label-caps">Deflection</div>
+              <div class="kpi-value tabular" id="kpi-deflection">0 mm</div>
+            </div>
+            <div class="kpi-tile">
+              <div class="label-caps">Total Load</div>
+              <div class="kpi-value tabular" id="kpi-total-load">0 kN</div>
+            </div>
+          </div>
+
+          <div class="label-caps" style="margin-bottom: var(--space-xs);">Failure Mode Sensors</div>
+          <div class="failure-strip">
+            <div class="fail-badge" id="fail-buckling"><span>Buckling</span><span class="tabular" id="count-buckling">0</span></div>
+            <div class="fail-badge" id="fail-flexing"><span>Flexing</span><span class="tabular" id="count-flexing">0</span></div>
+            <div class="fail-badge" id="fail-fracture"><span>Fracture</span><span class="tabular" id="count-fracture">0</span></div>
+            <div class="fail-badge" id="fail-toppling"><span>Toppling Over</span><span class="tabular" id="state-toppling">SAFE</span></div>
+          </div>
+        </section>
+
+        <!-- 2. ENVIRONMENT & MATERIAL CONTROLS -->
+        <section class="block card-wrapper">
+          <h3 style="border-bottom: var(--border-thick); padding-bottom: var(--space-xs); margin-bottom: var(--space-md);">Gravity, Wind &amp; Materials</h3>
+
+          <div class="control-list">
+            <div class="control-field">
+              <div class="control-label-row">
+                <label for="slider-load">Applied Load Multiplier (%)</label>
+              </div>
+              <div class="control-row">
+                <input type="range" id="slider-load" min="0" max="250" step="5" value="100" oninput="syncLoadFromSlider(this.value)">
+                <input type="number" id="input-load" min="0" max="250" step="5" value="100" aria-label="Applied load multiplier percentage" oninput="syncLoadFromNumber(this.value)">
+              </div>
+            </div>
+
+            <div class="control-field">
+              <div class="control-label-row">
+                <label for="slider-wind">Lateral Wind Force (kN)</label>
+              </div>
+              <div class="control-row">
+                <input type="range" id="slider-wind" min="-30" max="30" step="1" value="0" oninput="syncWindFromSlider(this.value)">
+                <input type="number" id="input-wind" min="-30" max="30" step="1" value="0" aria-label="Lateral wind force in kilonewtons" oninput="syncWindFromNumber(this.value)">
+              </div>
+            </div>
+
+            <div class="control-field">
+              <div class="control-label-row">
+                <label for="slider-gravity">Gravity Scale (g = 9.81 m/s²)</label>
+              </div>
+              <div class="control-row">
+                <input type="range" id="slider-gravity" min="0" max="2" step="0.1" value="1" oninput="syncGravityFromSlider(this.value)">
+                <input type="number" id="input-gravity" min="0" max="2" step="0.1" value="1" aria-label="Gravity scale multiplier" oninput="syncGravityFromNumber(this.value)">
+              </div>
+            </div>
+
+            <div class="dual-select-grid">
+              <div class="control-field">
+                <label for="select-profile">Steel Beam Profile</label>
+                <select id="select-profile" onchange="changeBeamProfile(this.value)">
+                  <option value="tube">Hollow Steel Tube</option>
+                  <option value="ibeam">Steel I-Beam (Reinforced)</option>
+                </select>
+              </div>
+              <div class="control-field">
+                <label for="select-base">Ground Base Support</label>
+                <select id="select-base" onchange="changeBaseMode(this.value)">
+                  <option value="pinned">Bolted Anchors</option>
+                  <option value="resting">Resting Feet (Tip-able)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. ANGLE STRESS & INSPECTOR -->
+        <section class="block card-wrapper">
+          <h3 style="border-bottom: var(--border-thick); padding-bottom: var(--space-xs); margin-bottom: var(--space-sm);">Angle Stress &amp; Joint Inspector</h3>
+          <div class="inspector-box" id="inspector-box">
+            <div class="label-caps">Selected Member</div>
+            <div id="insp-title" style="font-weight: 700;">Select any beam or node on the grid</div>
+            <div class="inspector-grid">
+              <div class="inspector-stat">
+                <div class="label-caps">Axial Force</div>
+                <div class="inspector-stat-val tabular" id="insp-force">—</div>
+              </div>
+              <div class="inspector-stat">
+                <div class="label-caps">Angle θ (Horiz.)</div>
+                <div class="inspector-stat-val tabular" id="insp-angle">—</div>
+              </div>
+              <div class="inspector-stat">
+                <div class="label-caps">Length / Buckling Limit</div>
+                <div class="inspector-stat-val tabular" id="insp-buckling">—</div>
+              </div>
+              <div class="inspector-stat">
+                <div class="label-caps">Stress Multiplier</div>
+                <div class="inspector-stat-val tabular" id="insp-multiplier">—</div>
+              </div>
+            </div>
+            <div class="math-equation" id="insp-math">
+              F_axial = F_vertical / sin(θ). Angles between 45° and 60° distribute loads efficiently without multiplying axial stress.
+            </div>
+            <div id="node-editor" style="display: none; border-top: var(--border-medium); padding-top: var(--space-sm);">
+              <div class="dual-select-grid">
+                <div class="control-field">
+                  <label for="node-load-input">Joint Load (kN)</label>
+                  <input type="number" id="node-load-input" min="0" max="120" step="5" value="0" onchange="updateSelectedNodeLoad(this.value)">
+                </div>
+                <div class="control-field">
+                  <label for="node-support-select">Joint Support</label>
+                  <select id="node-support-select" onchange="updateSelectedNodeSupport(this.value)">
+                    <option value="none">Free Joint</option>
+                    <option value="pinned">Bolted Anchor</option>
+                    <option value="roller">Roller Support</option>
+                    <option value="resting">Resting Foot</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </aside>
+    </main>
+
+    <!-- SECTION 1: LIVE MEMBER STRESS & ANGLE TABLE -->
+    <section class="section-open" aria-label="Member stress analysis table">
+      <div class="section-header-row">
+        <div>
+          <span class="kicker kicker-blue">Trigonometric Load Breakdown</span>
+          <h2 style="margin-top: var(--space-xs);">Steel Member Stress &amp; Angle Calculations</h2>
+        </div>
+        <div class="label-caps" id="table-summary-count">0 Members Analysed</div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Member</th>
+              <th>Role</th>
+              <th class="num">Length (m)</th>
+              <th class="num">Angle θ</th>
+              <th class="num">1 / sin(θ)</th>
+              <th class="num">Axial Force (kN)</th>
+              <th class="num">Buckling Limit (kN)</th>
+              <th class="num">Stress %</th>
+              <th>Condition</th>
+            </tr>
+          </thead>
+          <tbody id="stress-table-body">
+            <tr>
+              <td colspan="9">No steel beams constructed yet. Select Build Beam to connect joints.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SECTION 2: GRADE 8 CHALLENGES -->
+    <section class="section-open section-open-yellow" aria-label="Grade 8 engineering challenges">
+      <div class="section-header-row">
+        <div>
+          <span class="kicker kicker-yellow">Workshop Missions</span>
+          <h2 style="margin-top: var(--space-xs);">Grade 8 Triangulation Challenges</h2>
+        </div>
+        <div class="label-caps tabular" id="challenge-progress-label">0 / 4 Completed</div>
+      </div>
+
+      <div class="challenge-grid" id="challenge-grid">
+        <article class="challenge-card" id="chal-card-1">
+          <div>
+            <div class="challenge-top">
+              <span class="kicker">Mission 01</span>
+              <span class="role-tag" id="chal-status-1">Pending</span>
+            </div>
+            <h3 style="margin-top: var(--space-sm);">Stabilise the Unbraced Square</h3>
+            <p>Load <strong>2. Unbraced Square</strong> and watch it flex and collapse. Add at least two diagonal steel beams to form triangles so peak stress stays below 75% under 6 kN wind.</p>
+          </div>
+          <button type="button" class="btn btn-sm" onclick="loadPreset('unbraced-square')">Load Unbraced Square</button>
+        </article>
+
+        <article class="challenge-card" id="chal-card-2">
+          <div>
+            <div class="challenge-top">
+              <span class="kicker">Mission 02</span>
+              <span class="role-tag" id="chal-status-2">Pending</span>
+            </div>
+            <h3 style="margin-top: var(--space-sm);">Prevent Toppling Over</h3>
+            <p>Load <strong>6. Narrow Tower</strong> and apply 12 kN wind to observe toppling. Widen the base footprint to at least 3.0 m (or brace with angled legs) so the Centre of Gravity stays inside the base.</p>
+          </div>
+          <button type="button" class="btn btn-sm" onclick="loadPreset('narrow-topple')">Load Narrow Tower</button>
+        </article>
+
+        <article class="challenge-card" id="chal-card-3">
+          <div>
+            <span class="challenge-top">
+              <span class="kicker">Mission 03</span>
+              <span class="role-tag" id="chal-status-3">Pending</span>
+            </div>
+            <h3 style="margin-top: var(--space-sm);">Defeat Column Buckling</h3>
+            <p>Shorten effective strut lengths with cross-bracing or switch to a reinforced <strong>Steel I-Beam</strong> to support at least 45 kN total load with zero buckling failures.</p>
+          </div>
+          <button type="button" class="btn btn-sm" onclick="loadPreset('water-tower')">Test Water Tower</button>
+        </article>
+
+        <article class="challenge-card" id="chal-card-4">
+          <div>
+            <span class="challenge-top">
+              <span class="kicker">Mission 04</span>
+              <span class="role-tag" id="chal-status-4">Pending</span>
+            </div>
+            <h3 style="margin-top: var(--space-sm);">Optimal Angle Geometry</h3>
+            <p>Build or inspect a stable triangulated structure with at least 3 triangles and select an angled brace between 45° and 70° to verify a low stress multiplier (≤ 1.41×).</p>
+          </div>
+          <button type="button" class="btn btn-sm" onclick="loadPreset('warren-bridge')">Load Truss Bridge</button>
+        </article>
+      </div>
+    </section>
+
+    <!-- SECTION 3: CURRICULUM FIELD GUIDE -->
+    <section class="section-open section-open-red" aria-label="Grade 8 structures reference guide">
+      <div class="section-header-row">
+        <div>
+          <span class="kicker">CAPS Technology Reference</span>
+          <h2 style="margin-top: var(--space-xs);">Forces, Triangulation &amp; Structural Failure</h2>
+        </div>
+      </div>
+
+      <div class="ref-grid">
+        <article class="ref-card">
+          <div class="ref-accent-bar ref-bar-red" aria-hidden="true"></div>
+          <h3>Struts &amp; Compression (Red)</h3>
+          <p>A <strong>strut</strong> is a rigid structural member that resists a pushing, squashing force called <strong>compression</strong>. Examples include vertical water tower legs, bridge top chords, and roof truss rafters. Long, slender struts fail by <strong>buckling</strong> unless shortened with triangulation.</p>
+        </article>
+
+        <article class="ref-card">
+          <div class="ref-accent-bar ref-bar-blue" aria-hidden="true"></div>
+          <h3>Ties &amp; Tension (Blue)</h3>
+          <p>A <strong>tie</strong> is a member that holds or pulls two parts of a structure together under a stretching force called <strong>tension</strong>. Examples include bridge bottom chords, roof tie beams, king posts, and pylon guy cables. Excessive tension causes a member to stretch and <strong>fracture</strong>.</p>
+        </article>
+
+        <article class="ref-card">
+          <div class="ref-accent-bar ref-bar-yellow" aria-hidden="true"></div>
+          <h3>Triangulation &amp; Cross-Bracing</h3>
+          <p>Triangles resist deformation because their side lengths lock their angles rigid. <strong>Cross-bracing</strong> stiffens rectangular bays by crossing two diagonal members in an X shape, stopping lateral wind from shearing a tower sideways.</p>
+        </article>
+
+        <article class="ref-card">
+          <div class="ref-accent-bar ref-bar-black" aria-hidden="true"></div>
+          <h3>Four Structural Failure Modes</h3>
+          <p><strong>Buckling:</strong> ends bend inward under compression. <strong>Flexing:</strong> unbraced beams or joints curve outward under bending load. <strong>Fracture:</strong> material snaps when stress exceeds strength. <strong>Toppling over:</strong> a narrow base or top-heavy load lets the Centre of Gravity move outside the support footprint.</p>
+        </article>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <span>Grade 8 Technology · Frame Structures &amp; Triangulation Simulator (UK English)</span>
+      <span>Grounded in CAPS Grade 8 Technology curriculum topics: Frame Structures, Electrical Pylons, King &amp; Queen Post Trusses, and Structural Failure.</span>
+    </footer>
+
+  </div>
+
+  <api-shim></api-shim>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ---------------------------------------------------------
+       * 1. DESIGN TOKEN PALETTE READER (No raw hex in logic)
+       * --------------------------------------------------------- */
+      function getCssVar(name) {
+        return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      }
+
+      const PALETTE = {
+        bg: getCssVar('--canvas-bg') || '#faf7f2',
+        grid: getCssVar('--canvas-grid') || '#e3ddd3',
+        ground: getCssVar('--canvas-ground') || '#dcd5c9',
+        ink: getCssVar('--on-surface') || '#1a1a1a',
+        inkMuted: getCssVar('--on-surface-variant') || '#4a4a4a',
+        compression: getCssVar('--data-1') || '#e63b2e',
+        tension: getCssVar('--data-2') || '#0055ff',
+        neutral: getCssVar('--canvas-neutral-beam') || '#5c5852',
+        yellow: getCssVar('--primary-container') || '#ffcc00',
+        positive: getCssVar('--positive') || '#136f3a',
+        warning: getCssVar('--warning') || '#8a5a00',
+        error: getCssVar('--error') || '#cc0000',
+        white: getCssVar('--on-primary') || '#ffffff'
+      };
+
+      /* ---------------------------------------------------------
+       * 2. APPLICATION STATE & PHYSICS CONSTANTS
+       * --------------------------------------------------------- */
+      const WORLD_BOUNDS = { minX: -9, maxX: 9, minY: -1.1, maxY: 10.5 };
+      const SNAP_STEP = 0.5;
+      const SIM_SUBSTEPS = 22;
+      const DT_FRAME = 1 / 60;
+      const DT_SUB = DT_FRAME / SIM_SUBSTEPS;
+      const G_ACCEL = 9.81;
+
+      const PROFILES = {
+        tube: {
+          label: `Hollow Steel Tube`,
+          axialStiffness: 3600000,   // N (scaled for crisp interactive deflection)
+          bendStiffness: 950,        // N·m/rad joint flexural stiffness
+          bucklingFactor: 440,       // kN·m² -> P_cr = 440 / L^2
+          tensileLimitKN: 140,
+          linearMass: 12             // kg/m
+        },
+        ibeam: {
+          label: `Steel I-Beam`,
+          axialStiffness: 5200000,
+          bendStiffness: 2200,
+          bucklingFactor: 920,       // kN·m² -> P_cr = 920 / L^2
+          tensileLimitKN: 215,
+          linearMass: 18
+        }
+      };
+
+      const state = {
+        presetId: `water-tower`,
+        tool: `select`,
+        running: true,
+        profile: `tube`,
+        baseMode: `pinned`,
+        loadMultiplier: 100,
+        windKN: 0,
+        gravityScale: 1.0,
+        overlays: {
+          angles: true,
+          arrows: true,
+          cog: true
+        },
+        nodes: [],
+        beams: [],
+        jointAngles: [],
+        triangles: [],
+        sparks: [],
+        selectedBeamId: null,
+        selectedNodeId: null,
+        hoverBeamId: null,
+        hoverNodeId: null,
+        beamStartNodeId: null,
+        draggingNodeId: null,
+        pointerWorld: { x: 0, y: 0, inside: false },
+        undoStack: [],
+        metrics: {
+          peakStress: 0,
+          maxDeflectionMM: 0,
+          totalLoadKN: 0,
+          triangleCount: 0,
+          bucklingCount: 0,
+          flexingCount: 0,
+          fractureCount: 0,
+          isToppling: false,
+          cogX: 0,
+          cogY: 2,
+          baseMinX: -2,
+          baseMaxX: 2,
+          baseWidth: 4,
+          stableTicks: 0
+        },
+        challenges: {
+          c1: false,
+          c2: false,
+          c3: false,
+          c4: false
+        }
+      };
+
+      let nextIdCounter = 1;
+      function genId(prefix) {
+        nextIdCounter += 1;
+        return `${prefix}_${nextIdCounter}`;
+      }
+
+      /* ---------------------------------------------------------
+       * 3. PRESET STRUCTURES (Grounded in Grade 8 Curriculum)
+       * --------------------------------------------------------- */
+      function buildPresetData(presetId) {
+        const defs = {
+          'water-tower': {
+            baseMode: `pinned`,
+            windKN: 0,
+            loadMultiplier: 100,
+            profile: `tube`,
+            nodes: [
+              { key: `a`, x: -2.5, y: 0, support: `pinned`, loadKN: 0 },
+              { key: `b`, x: 2.5, y: 0, support: `pinned`, loadKN: 0 },
+              { key: `c`, x: -2.0, y: 2.0, support: `none`, loadKN: 0 },
+              { key: `d`, x: 2.0, y: 2.0, support: `none`, loadKN: 0 },
+              { key: `e`, x: -1.5, y: 4.0, support: `none`, loadKN: 0 },
+              { key: `f`, x: 1.5, y: 4.0, support: `none`, loadKN: 0 },
+              { key: `g`, x: -1.5, y: 6.0, support: `none`, loadKN: 20 },
+              { key: `h`, x: 1.5, y: 6.0, support: `none`, loadKN: 20 },
+              { key: `i`, x: 0, y: 7.5, support: `none`, loadKN: 20 }
+            ],
+            beams: [
+              [`a`, `c`], [`b`, `d`], [`c`, `d`], [`a`, `d`], [`b`, `c`],
+              [`c`, `e`], [`d`, `f`], [`e`, `f`], [`c`, `f`], [`d`, `e`],
+              [`e`, `g`], [`f`, `h`], [`g`, `h`], [`e`, `h`], [`f`, `g`],
+              [`g`, `i`], [`h`, `i`]
+            ]
+          },
+          'unbraced-square': {
+            baseMode: `pinned`,
+            windKN: 8,
+            loadMultiplier: 100,
+            profile: `tube`,
+            nodes: [
+              { key: `a`, x: -2.0, y: 0, support: `pinned`, loadKN: 0 },
+              { key: `b`, x: 2.0, y: 0, support: `pinned`, loadKN: 0 },
+              { key: `c`, x: -2.0, y: 3.0, support: `none`, loadKN: 0 },
+              { key: `d`, x: 2.0, y: 3.0, support: `none`, loadKN: 0 },
+              { key: `e`, x: -2.0, y: 6.0, support: `none`, loadKN: 20 },
+              { key: `f`, x: 2.0, y: 6.0, support: `none`, loadKN: 20 }
+            ],
+            beams: [
+              [`a`, `c`], [`b`, `d`], [`c`, `d`],
+              [`c`, `e`], [`d`, `f`], [`e`, `f`]
+            ]
+          },
+          'warren-bridge': {
+            baseMode: `pinned`,
+            windKN: 0,
+            loadMultiplier: 100,
+            profile: `tube`,
+            nodes: [
+              { key: `a`, x: -6.0, y: 2.0, support: `pinned`, loadKN: 0 },
+              { key: `b`, x: -3.0, y: 2.0, support: `none`, loadKN: 15 },
+              { key: `c`, x: 0.0, y: 2.0, support: `none`, loadKN: 35 },
+              { key: `d`, x: 3.0, y: 2.0, support: `none`, loadKN: 15 },
+              { key: `e`, x: 6.0, y: 2.0, support: `roller`, loadKN: 0 },
+              { key: `f`, x: -4.5, y: 4.5, support: `none`, loadKN: 0 },
+              { key: `g`, x: -1.5, y: 4.5, support: `none`, loadKN: 0 },
+              { key: `h`, x: 1.5, y: 4.5, support: `none`, loadKN: 0 },
+              { key: `i`, x: 4.5, y: 4.5, support: `none`, loadKN: 0 }
+            ],
+            beams: [
+              [`a`, `b`], [`b`, `c`], [`c`, `d`], [`d`, `e`],
+              [`f`, `g`], [`g`, `h`], [`h`, `i`],
+              [`a`, `f`], [`f`, `b`], [`b`, `g`], [`g`, `c`],
+              [`c`, `h`], [`h`, `d`], [`d`, `i`], [`i`, `e`]
+            ]
+          },
+          'electrical-pylon': {
+            baseMode: `pinned`,
+            windKN: 6,
+            loadMultiplier: 100,
+            profile: `tube`,
+            nodes: [
+              { key: `a`, x: -2.0, y: 0, support: `pinned`, loadKN: 0 },
+              { key: `b`, x: 2.0, y: 0, support: `pinned`, loadKN: 0 },
+              { key: `c`, x: -1.0, y: 3.0, support: `none`, loadKN: 0 },
+              { key: `d`, x: 1.0, y: 3.0, support: `none`, loadKN: 0 },
+              { key: `e`, x: -0.5, y: 5.5, support: `none`, loadKN: 0 },
+              { key: `f`, x: 0.5, y: 5.5, support: `none`, loadKN: 0 },
+              { key: `g`, x: -3.0, y: 5.5, support: `none`, loadKN: 15 },
+              { key: `h`, x: 3.0, y: 5.5, support: `none`, loadKN: 15 },
+              { key: `i`, x: 0, y: 7.5, support: `none`, loadKN: 5 }
+            ],
+            beams: [
+              [`a`, `c`], [`b`, `d`], [`c`, `d`], [`a`, `d`], [`b`, `c`],
+              [`c`, `e`], [`d`, `f`], [`e`, `f`], [`c`, `f`], [`d`, `e`],
+              [`g`, `e`], [`f`, `h`], [`e`, `i`], [`f`, `i`],
+              [`g`, `i`], [`h`, `i`], [`c`, `g`], [`d`, `h`]
+            ]
+          },
+          'king-post-truss': {
+            baseMode: `pinned`,
+            windKN: 0,
+            loadMultiplier: 100,
+            profile: `tube`,
+            nodes: [
+              { key: `a`, x: -5.0, y: 2.5, support: `pinned`, loadKN: 0 },
+              { key: `b`, x: -2.5, y: 2.5, support: `none`, loadKN: 0 },
+              { key: `c`, x: 0, y: 2.5, support: `none`, loadKN: 5 },
+              { key: `d`, x: 2.5, y: 2.5, support: `none`, loadKN: 0 },
+              { key: `e`, x: 5.0, y: 2.5, support: `roller`, loadKN: 0 },
+              { key: `f`, x: -2.5, y: 4.5, support: `none`, loadKN: 15 },
+              { key: `g`, x: 0, y: 6.5, support: `none`, loadKN: 25 },
+              { key: `h`, x: 2.5, y: 4.5, support: `none`, loadKN: 15 }
+            ],
+            beams: [
+              [`a`, `b`], [`b`, `c`], [`c`, `d`], [`d`, `e`],
+              [`a`, `f`], [`f`, `g`], [`g`, `h`], [`h`, `e`],
+              [`c`, `g`], [`c`, `f`], [`c`, `h`], [`b`, `f`], [`d`, `h`]
+            ]
+          },
+          'narrow-topple': {
+            baseMode: `resting`,
+            windKN: 12,
+            loadMultiplier: 100,
+            profile: `tube`,
+            nodes: [
+              { key: `a`, x: -0.75, y: 0, support: `resting`, loadKN: 0 },
+              { key: `b`, x: 0.75, y: 0, support: `resting`, loadKN: 0 },
+              { key: `c`, x: -0.75, y: 3.0, support: `none`, loadKN: 0 },
+              { key: `d`, x: 0.75, y: 3.0, support: `none`, loadKN: 0 },
+              { key: `e`, x: -1.5, y: 6.0, support: `none`, loadKN: 25 },
+              { key: `f`, x: 1.5, y: 6.0, support: `none`, loadKN: 25 }
+            ],
+            beams: [
+              [`a`, `c`], [`b`, `d`], [`c`, `d`], [`a`, `d`], [`b`, `c`],
+              [`c`, `e`], [`d`, `f`], [`e`, `f`], [`c`, `f`], [`d`, `e`]
+            ]
+          },
+          'blank': {
+            baseMode: `pinned`,
+            windKN: 0,
+            loadMultiplier: 100,
+            profile: `tube`,
+            nodes: [
+              { key: `a`, x: -3.0, y: 0, support: `pinned`, loadKN: 0 },
+              { key: `b`, x: 3.0, y: 0, support: `pinned`, loadKN: 0 }
+            ],
+            beams: []
+          }
+        };
+        return defs[presetId] || defs['water-tower'];
+      }
+
+      /* ---------------------------------------------------------
+       * 4. TOPOLOGY, TRIANGLES & REST GEOMETRY
+       * --------------------------------------------------------- */
+      function snapshotGeometry() {
+        return {
+          nodes: state.nodes.map(function (n) {
+            return { id: n.id, x: n.restX, y: n.restY, support: n.support, loadKN: n.loadKN };
+          }),
+          beams: state.beams.map(function (b) {
+            return { id: b.id, a: b.a, b: b.b };
+          })
+        };
+      }
+
+      function pushUndo() {
+        state.undoStack.push(snapshotGeometry());
+        if (state.undoStack.length > 25) state.undoStack.shift();
+        updateUndoBtn();
+      }
+
+      function updateUndoBtn() {
+        const btn = document.getElementById('btn-undo');
+        if (btn) btn.disabled = state.undoStack.length === 0;
+      }
+
+      function rebuildTopology() {
+        const nodeMap = new Map();
+        state.nodes.forEach(function (n) {
+          nodeMap.set(n.id, n);
+          n.mass = 120;
+        });
+
+        const adj = new Map();
+        state.nodes.forEach(function (n) { adj.set(n.id, []); });
+
+        const prof = PROFILES[state.profile];
+        const validBeams = [];
+
+        state.beams.forEach(function (beam) {
+          const na = nodeMap.get(beam.a);
+          const nb = nodeMap.get(beam.b);
+          if (!na || !nb || na.id === nb.id) return;
+
+          const dx = nb.restX - na.restX;
+          const dy = nb.restY - na.restY;
+          const len = Math.hypot(dx, dy);
+          if (len < 0.1) return;
+
+          beam.restLen = len;
+          beam.axialForceKN = 0;
+          beam.stressRatio = 0;
+          beam.role = `neutral`;
+          beam.state = `ok`;
+          beam.buckleBow = 0;
+          beam.flexBow = 0;
+          beam.buckleDir = beam.buckleDir || (validBeams.length % 2 === 0 ? 1 : -1);
+          beam.buckledLatch = false;
+          beam.bucklingLimitKN = prof.bucklingFactor / (len * len);
+          beam.tensileLimitKN = prof.tensileLimitKN;
+          beam.angleDeg = Math.abs(Math.atan2(dy, dx) * 180 / Math.PI);
+          if (beam.angleDeg > 90) beam.angleDeg = 180 - beam.angleDeg;
+
+          const halfMass = 0.5 * len * prof.linearMass;
+          na.mass += halfMass;
+          nb.mass += halfMass;
+
+          adj.get(na.id).push({ other: nb.id, beamId: beam.id });
+          adj.get(nb.id).push({ other: na.id, beamId: beam.id });
+          validBeams.push(beam);
+        });
+        state.beams = validBeams;
+
+        // Build joint angle pairs for flexural stiffness (enables flexing mode on unbraced squares)
+        state.jointAngles = [];
+        state.nodes.forEach(function (center) {
+          const nbrs = adj.get(center.id) || [];
+          if (nbrs.length < 2) return;
+          const sorted = nbrs.map(function (item) {
+            const o = nodeMap.get(item.other);
+            const ang = Math.atan2(o.restY - center.restY, o.restX - center.restX);
+            return { id: item.other, beamId: item.beamId, ang: ang };
+          }).sort(function (p, q) { return p.ang - q.ang; });
+
+          for (let i = 0; i < sorted.length; i++) {
+            const cur = sorted[i];
+            const nxt = sorted[(i + 1) % sorted.length];
+            if (cur.id === nxt.id) continue;
+            let diff = nxt.ang - cur.ang;
+            if (diff <= 0) diff += Math.PI * 2;
+            if (diff < Math.PI * 1.45) {
+              state.jointAngles.push({
+                center: center.id,
+                a: cur.id,
+                b: nxt.id,
+                beamA: cur.beamId,
+                beamB: nxt.beamId,
+                restAngle: diff,
+                deltaDeg: 0
+              });
+            }
+          }
+        });
+
+        // Detect triangles (u, v, w)
+        state.triangles = [];
+        const edgeSet = new Set();
+        state.beams.forEach(function (b) {
+          const k1 = `${b.a}|${b.b}`;
+          const k2 = `${b.b}|${b.a}`;
+          edgeSet.add(k1);
+          edgeSet.add(k2);
+        });
+
+        const nCount = state.nodes.length;
+        for (let i = 0; i < nCount; i++) {
+          for (let j = i + 1; j < nCount; j++) {
+            const ni = state.nodes[i];
+            const nj = state.nodes[j];
+            if (!edgeSet.has(`${ni.id}|${nj.id}`)) continue;
+            for (let k = j + 1; k < nCount; k++) {
+              const nk = state.nodes[k];
+              if (edgeSet.has(`${ni.id}|${nk.id}`) && edgeSet.has(`${nj.id}|${nk.id}`)) {
+                state.triangles.push([ni.id, nj.id, nk.id]);
+              }
+            }
+          }
+        }
+        state.metrics.triangleCount = state.triangles.length;
+
+        // Compute base footprint
+        let minX = Infinity;
+        let maxX = -Infinity;
+        state.nodes.forEach(function (n) {
+          if (n.support !== `none`) {
+            if (n.restX < minX) minX = n.restX;
+            if (n.restX > maxX) maxX = n.restX;
+          }
+        });
+        if (!isFinite(minX)) {
+          minX = 0;
+          maxX = 0;
+        }
+        state.metrics.baseMinX = minX;
+        state.metrics.baseMaxX = maxX;
+        state.metrics.baseWidth = Math.max(0, maxX - minX);
+      }
+
+      function resetNodesToRest() {
+        state.nodes.forEach(function (n) {
+          n.x = n.restX;
+          n.y = n.restY;
+          n.vx = 0;
+          n.vy = 0;
+          n.fx = 0;
+          n.fy = 0;
+        });
+        state.beams.forEach(function (b) {
+          b.state = `ok`;
+          b.buckledLatch = false;
+          b.buckleBow = 0;
+          b.flexBow = 0;
+          b.axialForceKN = 0;
+          b.stressRatio = 0;
+          b.role = `neutral`;
+        });
+        state.sparks = [];
+        state.metrics.isToppling = false;
+        state.metrics.stableTicks = 0;
+        rebuildTopology();
+      }
+
+      /* ---------------------------------------------------------
+       * 5. PHYSICS & STRUCTURAL INTEGRITY SOLVER
+       * --------------------------------------------------------- */
+      function stepPhysics() {
+        const nodeMap = new Map();
+        state.nodes.forEach(function (n) { nodeMap.set(n.id, n); });
+
+        const prof = PROFILES[state.profile];
+        const loadFactor = state.loadMultiplier / 100;
+        const gravScale = state.gravityScale;
+        const windN = state.windKN * 1000;
+
+        // Find max height for proportional wind pressure
+        let maxH = 1;
+        state.nodes.forEach(function (n) {
+          if (n.restY > maxH) maxH = n.restY;
+        });
+        const nonGroundCount = Math.max(1, state.nodes.filter(function (n) { return n.restY > 0.2; }).length);
+
+        for (let step = 0; step < SIM_SUBSTEPS; step++) {
+          // 1. External gravity, point loads, and wind
+          for (let i = 0; i < state.nodes.length; i++) {
+            const n = state.nodes[i];
+            const effMass = n.mass + n.loadKN * loadFactor * 20;
+            n._effMass = effMass;
+            n.fx = 0;
+            n.fy = -effMass * G_ACCEL * gravScale - (n.loadKN * 1000 * loadFactor);
+
+            if (n.restY > 0.2 && windN !== 0) {
+              const heightRatio = Math.max(0.15, n.restY / maxH);
+              n.fx += (windN / nonGroundCount) * heightRatio * 1.45;
+            }
+          }
+
+          // 2. Axial spring & damper forces on intact beams
+          for (let i = 0; i < state.beams.length; i++) {
+            const b = state.beams[i];
+            if (b.state === `fractured`) {
+              b.axialForceKN = 0;
+              b.stressRatio = 0;
+              continue;
+            }
+
+            const na = nodeMap.get(b.a);
+            const nb = nodeMap.get(b.b);
+            if (!na || !nb) continue;
+
+            const dx = nb.x - na.x;
+            const dy = nb.y - na.y;
+            const dist = Math.hypot(dx, dy) || 0.0001;
+            const ux = dx / dist;
+            const uy = dy / dist;
+
+            const stretch = dist - b.restLen; // + = tension, - = compression
+            const kAxial = prof.axialStiffness / b.restLen;
+
+            let forceMag = kAxial * stretch; // Newtons (+ pulls inward -> tension)
+
+            // Check Buckling under compression (forceMag < 0)
+            const compKN = Math.max(0, -forceMag / 1000);
+            if (compKN > b.bucklingLimitKN) {
+              b.buckledLatch = true;
+            }
+
+            if (b.buckledLatch && stretch < 0) {
+              // Post-buckling softening: buckled column loses compressive stiffness
+              const capN = b.bucklingLimitKN * 1000 * 0.48;
+              forceMag = Math.max(-capN, forceMag * 0.42);
+            }
+
+            // Axial velocity damping
+            const relVx = nb.vx - na.vx;
+            const relVy = nb.vy - na.vy;
+            const vAlong = relVx * ux + relVy * uy;
+            const dampCoeff = 0.62 * 2 * Math.sqrt(kAxial * 160);
+            const fTotal = forceMag + dampCoeff * vAlong;
+
+            na.fx += fTotal * ux;
+            na.fy += fTotal * uy;
+            nb.fx -= fTotal * ux;
+            nb.fy -= fTotal * uy;
+
+            // Record smoothed axial force (last substep)
+            if (step === SIM_SUBSTEPS - 1) {
+              b.axialForceKN = forceMag / 1000;
+            }
+          }
+
+          // 3. Joint flexural stiffness (lets unbraced squares lean & flex before failing)
+          for (let i = 0; i < state.jointAngles.length; i++) {
+            const ja = state.jointAngles[i];
+            const nc = nodeMap.get(ja.center);
+            const na = nodeMap.get(ja.a);
+            const nb = nodeMap.get(ja.b);
+            if (!nc || !na || !nb) continue;
+
+            const ba = state.beams.find(function (m) { return m.id === ja.beamA; });
+            const bb = state.beams.find(function (m) { return m.id === ja.beamB; });
+            if ((ba && ba.state === `fractured`) || (bb && bb.state === `fractured`)) continue;
+
+            const vax = na.x - nc.x;
+            const vay = na.y - nc.y;
+            const vbx = nb.x - nc.x;
+            const vby = nb.y - nc.y;
+            const la = Math.hypot(vax, vay) || 0.01;
+            const lb = Math.hypot(vbx, vby) || 0.01;
+
+            let curAngle = Math.atan2(vby, vbx) - Math.atan2(vay, vax);
+            if (curAngle <= 0) curAngle += Math.PI * 2;
+            let err = ja.restAngle - curAngle;
+            if (err > Math.PI) err -= Math.PI * 2;
+            if (err < -Math.PI) err += Math.PI * 2;
+
+            const torque = prof.bendStiffness * err;
+            const fa = torque / la;
+            const fb = torque / lb;
+
+            // Perpendicular tangents
+            const pax = -vay / la;
+            const pay = vax / la;
+            const pbx = -vby / lb;
+            const pby = vbx / lb;
+
+            na.fx -= fa * pax;
+            na.fy -= fa * pay;
+            nb.fx += fb * pbx;
+            nb.fy += fb * pby;
+            nc.fx += fa * pax - fb * pbx;
+            nc.fy += fa * pay - fb * pby;
+
+            if (step === SIM_SUBSTEPS - 1) {
+              ja.deltaDeg = Math.abs(err * 180 / Math.PI);
+            }
+          }
+
+          // 4. Integrate velocities & positions
+          for (let i = 0; i < state.nodes.length; i++) {
+            const n = state.nodes[i];
+            if (n.support === `pinned`) {
+              n.x = n.restX;
+              n.y = n.restY;
+              n.vx = 0;
+              n.vy = 0;
+              continue;
+            }
+
+            const ax = n.fx / n._effMass;
+            const ay = n.fy / n._effMass;
+            n.vx = (n.vx + ax * DT_SUB) * 0.9965;
+            n.vy = (n.vy + ay * DT_SUB) * 0.9965;
+
+            // Clamp extreme speeds for numerical safety
+            const speed = Math.hypot(n.vx, n.vy);
+            if (speed > 18) {
+              const s = 18 / speed;
+              n.vx *= s;
+              n.vy *= s;
+            }
+
+            n.x += n.vx * DT_SUB;
+            n.y += n.vy * DT_SUB;
+
+            if (n.support === `roller`) {
+              n.y = n.restY;
+              n.vy = 0;
+              n.vx *= 0.94;
+            }
+
+            // Ground collision plane at y = 0
+            if (n.y < 0) {
+              n.y = 0;
+              if (n.vy < 0) n.vy = 0;
+              n.vx *= 0.6;
+            }
+            // Keep within world walls softly
+            if (n.x < WORLD_BOUNDS.minX) { n.x = WORLD_BOUNDS.minX; n.vx = 0; }
+            if (n.x > WORLD_BOUNDS.maxX) { n.x = WORLD_BOUNDS.maxX; n.vx = 0; }
+          }
+        }
+
+        // 5. Evaluate Member Roles, Failure Modes, CoG, and Telemetry
+        evaluateDiagnostics(nodeMap);
+      }
+
+      function evaluateDiagnostics(nodeMap) {
+        const loadFactor = state.loadMultiplier / 100;
+        let peakStress = 0;
+        let maxDeflM = 0;
+        let totalLoadKN = 0;
+        let sumWX = 0;
+        let sumWY = 0;
+        let sumW = 0;
+
+        state.nodes.forEach(function (n) {
+          const defl = Math.hypot(n.x - n.restX, n.y - n.restY);
+          if (defl > maxDeflM) maxDeflM = defl;
+          const nodeLoad = n.loadKN * loadFactor;
+          totalLoadKN += nodeLoad;
+          const weightN = n.mass * G_ACCEL * state.gravityScale + nodeLoad * 1000;
+          sumWX += weightN * n.x;
+          sumWY += weightN * n.y;
+          sumW += weightN;
+        });
+
+        const cogX = sumW > 0 ? sumWX / sumW : 0;
+        const cogY = sumW > 0 ? sumWY / sumW : 0;
+        state.metrics.cogX = cogX;
+        state.metrics.cogY = cogY;
+        state.metrics.totalLoadKN = totalLoadKN;
+        state.metrics.maxDeflectionMM = maxDeflM * 1000;
+
+        // Track max joint bend per beam for Flexing detection
+        const beamBendMap = new Map();
+        state.jointAngles.forEach(function (ja) {
+          const prevA = beamBendMap.get(ja.beamA) || 0;
+          const prevB = beamBendMap.get(ja.beamB) || 0;
+          if (ja.deltaDeg > prevA) beamBendMap.set(ja.beamA, ja.deltaDeg);
+          if (ja.deltaDeg > prevB) beamBendMap.set(ja.beamB, ja.deltaDeg);
+        });
+
+        let buckCnt = 0;
+        let flexCnt = 0;
+        let fracCnt = 0;
+
+        state.beams.forEach(function (b) {
+          const na = nodeMap.get(b.a);
+          const nb = nodeMap.get(b.b);
+          if (!na || !nb) return;
+
+          // Update live angle
+          const dx = nb.x - na.x;
+          const dy = nb.y - na.y;
+          let ang = Math.abs(Math.atan2(dy, dx) * 180 / Math.PI);
+          if (ang > 90) ang = 180 - ang;
+          b.angleDeg = ang;
+
+          if (b.state === `fractured`) {
+            fracCnt += 1;
+            b.role = `neutral`;
+            b.stressRatio = 1;
+            peakStress = Math.max(peakStress, 100);
+            return;
+          }
+
+          const f = b.axialForceKN;
+          if (f > 1.2) {
+            b.role = `tie`;
+            b.stressRatio = f / b.tensileLimitKN;
+          } else if (f < -1.2) {
+            b.role = `strut`;
+            b.stressRatio = Math.abs(f) / b.bucklingLimitKN;
+          } else {
+            b.role = `neutral`;
+            b.stressRatio = Math.abs(f) / Math.min(b.bucklingLimitKN, b.tensileLimitKN);
+          }
+
+          const stressPct = b.stressRatio * 100;
+          if (stressPct > peakStress) peakStress = stressPct;
+
+          const bendDeg = beamBendMap.get(b.id) || 0;
+
+          // Check Fracture
+          if (f > b.tensileLimitKN || (b.buckledLatch && Math.abs(f) > b.bucklingLimitKN * 1.95 && bendDeg > 14)) {
+            b.state = `fractured`;
+            fracCnt += 1;
+            spawnSparks((na.x + nb.x) * 0.5, (na.y + nb.y) * 0.5);
+            return;
+          }
+
+          // Check Buckling
+          if (b.buckledLatch || (f < -b.bucklingLimitKN)) {
+            b.state = `buckling`;
+            b.buckledLatch = true;
+            const curLen = Math.hypot(dx, dy);
+            const shorten = Math.max(0.05, b.restLen - curLen);
+            b.buckleBow = Math.min(0.75, Math.sqrt(shorten * b.restLen) * 0.65);
+            buckCnt += 1;
+          } else if (bendDeg > 4.5) {
+            // Check Flexing
+            b.state = `flexing`;
+            b.flexBow = Math.min(0.45, (bendDeg - 3) * 0.025);
+            flexCnt += 1;
+          } else {
+            b.state = `ok`;
+            b.buckleBow = 0;
+            b.flexBow = 0;
+          }
+        });
+
+        // Check Toppling Over
+        let isToppling = false;
+        const hasResting = state.nodes.some(function (n) { return n.support === `resting`; });
+        const restingLifted = state.nodes.some(function (n) { return n.support === `resting` && n.y > 0.1; });
+        const outsideBase = state.metrics.baseWidth > 0.05 &&
+          (cogX < state.metrics.baseMinX - 0.08 || cogX > state.metrics.baseMaxX + 0.08);
+        if ((hasResting && (restingLifted || outsideBase)) || (outsideBase && maxDeflM > 0.6)) {
+          isToppling = true;
+        }
+
+        state.metrics.peakStress = peakStress;
+        state.metrics.bucklingCount = buckCnt;
+        state.metrics.flexingCount = flexCnt;
+        state.metrics.fractureCount = fracCnt;
+        state.metrics.isToppling = isToppling;
+
+        if (state.running && buckCnt === 0 && flexCnt === 0 && fracCnt === 0 && !isToppling && peakStress < 95) {
+          state.metrics.stableTicks += 1;
+        } else {
+          state.metrics.stableTicks = 0;
+        }
+
+        // Check Grade 8 Challenges
+        evaluateChallenges();
+      }
+
+      function spawnSparks(wx, wy) {
+        for (let i = 0; i < 14; i++) {
+          const ang = Math.random() * Math.PI * 2;
+          const spd = 1.5 + Math.random() * 4;
+          state.sparks.push({
+            x: wx,
+            y: wy,
+            vx: Math.cos(ang) * spd,
+            vy: Math.sin(ang) * spd + 1.5,
+            life: 1.0
+          });
+        }
+      }
+
+      function evaluateChallenges() {
+        const m = state.metrics;
+        const noFailures = m.bucklingCount === 0 && m.flexingCount === 0 && m.fractureCount === 0 && !m.isToppling;
+
+        // Challenge 1: Stabilise Unbraced Square (triangles >= 2, peakStress < 75, wind >= 6, stableTicks >= 45)
+        if (!state.challenges.c1 && state.presetId === `unbraced-square` &&
+            m.triangleCount >= 2 && noFailures && m.peakStress < 75 && Math.abs(state.windKN) >= 6 && m.stableTicks >= 45) {
+          state.challenges.c1 = true;
+          onChallengeUnlocked(1);
+        }
+
+        // Challenge 2: Prevent Toppling Over (baseWidth >= 3.0, wind >= 10, no toppling, triangles >= 2)
+        if (!state.challenges.c2 && m.baseWidth >= 3.0 && Math.abs(state.windKN) >= 10 &&
+            noFailures && m.triangleCount >= 2 && m.stableTicks >= 45) {
+          state.challenges.c2 = true;
+          onChallengeUnlocked(2);
+        }
+
+        // Challenge 3: Defeat Buckling (totalLoadKN >= 45, no buckling/fracture, stable)
+        if (!state.challenges.c3 && m.totalLoadKN >= 45 && noFailures && m.triangleCount >= 2 && m.stableTicks >= 45) {
+          state.challenges.c3 = true;
+          onChallengeUnlocked(3);
+        }
+
+        // Challenge 4: Optimal Angle Geometry (triangles >= 3, stable, selected beam angle 45..70)
+        if (!state.challenges.c4 && m.triangleCount >= 3 && noFailures && m.stableTicks >= 30 && state.selectedBeamId) {
+          const sel = state.beams.find(function (b) { return b.id === state.selectedBeamId; });
+          if (sel && sel.angleDeg >= 45 && sel.angleDeg <= 70) {
+            state.challenges.c4 = true;
+            onChallengeUnlocked(4);
+          }
+        }
+      }
+
+      function onChallengeUnlocked(num) {
+        showToast(`Mission 0${num} completed!`);
+        renderChallengeCards();
+        scheduleSave();
+      }
+
+      /* ---------------------------------------------------------
+       * 6. CANVAS COORDINATE TRANSFORMS & DRAWING
+       * --------------------------------------------------------- */
+      const canvas = document.getElementById(`sim-canvas`);
+      const ctx = canvas ? canvas.getContext(`2d`) : null;
+      let viewMetrics = { width: 800, height: 540, scale: 42, originX: 400, originY: 460 };
+
+      function updateCanvasSize() {
+        if (!canvas) return;
+        const shell = document.getElementById(`canvas-shell`);
+        const w = shell ? shell.clientWidth : 800;
+        const h = shell ? shell.clientHeight : 540;
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.max(1, Math.floor(w * dpr));
+        canvas.height = Math.max(1, Math.floor(h * dpr));
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        const scaleX = w / (WORLD_BOUNDS.maxX - WORLD_BOUNDS.minX);
+        const scaleY = h / (WORLD_BOUNDS.maxY - WORLD_BOUNDS.minY);
+        const scale = Math.min(scaleX, scaleY);
+        viewMetrics = {
+          width: w,
+          height: h,
+          scale: scale,
+          originX: w * 0.5,
+          originY: h - (0 - WORLD_BOUNDS.minY) * scale
+        };
+      }
+
+      function worldToScreen(wx, wy) {
+        return {
+          x: viewMetrics.originX + wx * viewMetrics.scale,
+          y: viewMetrics.originY - wy * viewMetrics.scale
+        };
+      }
+
+      function screenToWorld(sx, sy) {
+        return {
+          x: (sx - viewMetrics.originX) / viewMetrics.scale,
+          y: (viewMetrics.originY - sy) / viewMetrics.scale
+        };
+      }
+
+      function snapVal(v) {
+        return Math.round(v / SNAP_STEP) * SNAP_STEP;
+      }
+
+      function getBeamColor(b) {
+        if (b.state === `fractured`) return PALETTE.error;
+        if (b.role === `strut`) {
+          return b.stressRatio > 0.2 ? PALETTE.compression : PALETTE.neutral;
+        }
+        if (b.role === `tie`) {
+          return b.stressRatio > 0.2 ? PALETTE.tension : PALETTE.neutral;
+        }
+        return PALETTE.neutral;
+      }
+
+      function drawCanvas() {
+        if (!ctx || !canvas) return;
+        const w = viewMetrics.width;
+        const h = viewMetrics.height;
+        const sc = viewMetrics.scale;
+
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = PALETTE.bg;
+        ctx.fillRect(0, 0, w, h);
+
+        // 1. Metric Grid (0.5m minor, 1.0m major)
+        ctx.lineWidth = 1;
+        for (let gx = Math.ceil(WORLD_BOUNDS.minX); gx <= Math.floor(WORLD_BOUNDS.maxX); gx += 0.5) {
+          const sx = viewMetrics.originX + gx * sc;
+          const isMajor = Math.abs(gx % 1) < 0.01;
+          ctx.strokeStyle = PALETTE.grid;
+          ctx.globalAlpha = isMajor ? 0.9 : 0.45;
+          ctx.beginPath();
+          ctx.moveTo(sx, 0);
+          ctx.lineTo(sx, viewMetrics.originY);
+          ctx.stroke();
+        }
+        for (let gy = 0; gy <= WORLD_BOUNDS.maxY; gy += 0.5) {
+          const sy = viewMetrics.originY - gy * sc;
+          const isMajor = Math.abs(gy % 1) < 0.01;
+          ctx.strokeStyle = PALETTE.grid;
+          ctx.globalAlpha = isMajor ? 0.9 : 0.45;
+          ctx.beginPath();
+          ctx.moveTo(0, sy);
+          ctx.lineTo(w, sy);
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+
+        // 2. Ground Foundation Slab & Base Stability Zone
+        const gy = viewMetrics.originY;
+        ctx.fillStyle = PALETTE.ground;
+        ctx.fillRect(0, gy, w, h - gy);
+
+        // Ground hatch marks
+        ctx.strokeStyle = PALETTE.inkMuted;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        for (let hx = -20; hx < w + 40; hx += 18) {
+          ctx.moveTo(hx, gy);
+          ctx.lineTo(hx - 14, gy + 18);
+        }
+        ctx.stroke();
+
+        // Heavy ground datum line
+        ctx.strokeStyle = PALETTE.ink;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(0, gy);
+        ctx.lineTo(w, gy);
+        ctx.stroke();
+
+        // Base Footprint Bracket if CoG overlay enabled
+        if (state.overlays.cog && state.metrics.baseWidth > 0.1) {
+          const bx1 = worldToScreen(state.metrics.baseMinX, 0).x;
+          const bx2 = worldToScreen(state.metrics.baseMaxX, 0).x;
+          ctx.fillStyle = state.metrics.isToppling ? PALETTE.error : PALETTE.positive;
+          ctx.fillRect(bx1, gy + 2, bx2 - bx1, 7);
+        }
+
+        // Preset contextual props (e.g., Bridge Canyon / Water Tank silhouette)
+        drawPresetContext();
+
+        const nodeMap = new Map();
+        state.nodes.forEach(function (n) { nodeMap.set(n.id, n); });
+
+        // 3. Subtle Triangulated Zone Shading
+        ctx.save();
+        ctx.fillStyle = PALETTE.tension;
+        ctx.globalAlpha = 0.045;
+        state.triangles.forEach(function (tri) {
+          const n1 = nodeMap.get(tri[0]);
+          const n2 = nodeMap.get(tri[1]);
+          const n3 = nodeMap.get(tri[2]);
+          if (!n1 || !n2 || !n3) return;
+          const p1 = worldToScreen(n1.x, n1.y);
+          const p2 = worldToScreen(n2.x, n2.y);
+          const p3 = worldToScreen(n3.x, n3.y);
+          ctx.beginPath();
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.lineTo(p3.x, p3.y);
+          ctx.closePath();
+          ctx.fill();
+        });
+        ctx.restore();
+
+        // 4. Wind Arrows on left/right side
+        if (Math.abs(state.windKN) > 0.5) {
+          drawWindIndicators();
+        }
+
+        // 5. Steel Beams
+        state.beams.forEach(function (b) {
+          const na = nodeMap.get(b.a);
+          const nb = nodeMap.get(b.b);
+          if (!na || !nb) return;
+          const pa = worldToScreen(na.x, na.y);
+          const pb = worldToScreen(nb.x, nb.y);
+          const isSelected = b.id === state.selectedBeamId;
+          const isHovered = b.id === state.hoverBeamId;
+
+          drawBeam(b, pa, pb, isSelected, isHovered);
+        });
+
+        // 6. Active Beam Drawing Preview
+        if (state.tool === `beam` && state.beamStartNodeId && state.pointerWorld.inside) {
+          const startNode = nodeMap.get(state.beamStartNodeId);
+          if (startNode) {
+            const ps = worldToScreen(startNode.x, startNode.y);
+            const tx = snapVal(state.pointerWorld.x);
+            const ty = Math.max(0, snapVal(state.pointerWorld.y));
+            const pe = worldToScreen(tx, ty);
+            const len = Math.hypot(tx - startNode.x, ty - startNode.y);
+            let ang = Math.abs(Math.atan2(ty - startNode.y, tx - startNode.x) * 180 / Math.PI);
+            if (ang > 90) ang = 180 - ang;
+
+            ctx.save();
+            ctx.setLineDash([7, 5]);
+            ctx.strokeStyle = PALETTE.tension;
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(ps.x, ps.y);
+            ctx.lineTo(pe.x, pe.y);
+            ctx.stroke();
+            ctx.restore();
+
+            // Live dimension tag
+            drawCanvasBadge((ps.x + pe.x) * 0.5, (ps.y + pe.y) * 0.5 - 18, `${len.toFixed(2)} m · ${ang.toFixed(0)}°`, PALETTE.yellow, PALETTE.ink);
+          }
+        }
+
+        // 7. Angle Arcs Overlay
+        if (state.overlays.angles) {
+          drawAngleOverlays(nodeMap);
+        }
+
+        // 8. Centre of Gravity Plumb Line Overlay
+        if (state.overlays.cog && state.nodes.length > 0) {
+          const cogPt = worldToScreen(state.metrics.cogX, state.metrics.cogY);
+          ctx.save();
+          ctx.setLineDash([5, 4]);
+          ctx.strokeStyle = state.metrics.isToppling ? PALETTE.error : PALETTE.ink;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(cogPt.x, cogPt.y);
+          ctx.lineTo(cogPt.x, gy + 12);
+          ctx.stroke();
+          ctx.restore();
+
+          // CoG target marker
+          ctx.fillStyle = PALETTE.yellow;
+          ctx.strokeStyle = PALETTE.ink;
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.arc(cogPt.x, cogPt.y, 9, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          drawCanvasBadge(cogPt.x, cogPt.y - 22, `CoG`, PALETTE.yellow, PALETTE.ink);
+        }
+
+        // 9. Nodes / Joints & Applied Loads
+        state.nodes.forEach(function (n) {
+          const p = worldToScreen(n.x, n.y);
+          const isSelected = n.id === state.selectedNodeId || n.id === state.beamStartNodeId;
+          const isHovered = n.id === state.hoverNodeId;
+          drawNode(n, p, isSelected, isHovered);
+        });
+
+        // 10. Snap Ghost Cursor in Place Node / Beam mode
+        if ((state.tool === `node` || (state.tool === `beam` && !state.beamStartNodeId)) && state.pointerWorld.inside) {
+          const sx = snapVal(state.pointerWorld.x);
+          const sy = Math.max(0, snapVal(state.pointerWorld.y));
+          const sp = worldToScreen(sx, sy);
+          ctx.save();
+          ctx.strokeStyle = PALETTE.tension;
+          ctx.lineWidth = 2;
+          ctx.strokeRect(sp.x - 7, sp.y - 7, 14, 14);
+          ctx.restore();
+        }
+
+        // 11. Fracture Sparks
+        for (let i = state.sparks.length - 1; i >= 0; i--) {
+          const sk = state.sparks[i];
+          sk.x += sk.vx * DT_FRAME;
+          sk.y += sk.vy * DT_FRAME;
+          sk.vy -= 9.8 * DT_FRAME;
+          sk.life -= 0.03;
+          if (sk.life <= 0) {
+            state.sparks.splice(i, 1);
+            continue;
+          }
+          const sp = worldToScreen(sk.x, sk.y);
+          ctx.fillStyle = PALETTE.yellow;
+          ctx.strokeStyle = PALETTE.ink;
+          ctx.lineWidth = 1;
+          ctx.fillRect(sp.x - 3, sp.y - 3, 6, 6);
+          ctx.strokeRect(sp.x - 3, sp.y - 3, 6, 6);
+        }
+      }
+
+      function drawPresetContext() {
+        const gy = viewMetrics.originY;
+        if (state.presetId === `warren-bridge`) {
+          // Draw bridge abutment piers under (-6, 2) and (6, 2)
+          const leftPier = worldToScreen(-6, 2);
+          const rightPier = worldToScreen(6, 2);
+          ctx.fillStyle = PALETTE.grid;
+          ctx.strokeStyle = PALETTE.ink;
+          ctx.lineWidth = 2;
+          ctx.fillRect(leftPier.x - 24, leftPier.y, 48, gy - leftPier.y);
+          ctx.strokeRect(leftPier.x - 24, leftPier.y, 48, gy - leftPier.y);
+          ctx.fillRect(rightPier.x - 24, rightPier.y, 48, gy - rightPier.y);
+          ctx.strokeRect(rightPier.x - 24, rightPier.y, 48, gy - rightPier.y);
+        } else if (state.presetId === `king-post-truss`) {
+          const leftWall = worldToScreen(-5, 2.5);
+          const rightWall = worldToScreen(5, 2.5);
+          ctx.fillStyle = PALETTE.grid;
+          ctx.strokeStyle = PALETTE.ink;
+          ctx.lineWidth = 2;
+          ctx.fillRect(leftWall.x - 20, leftWall.y, 40, gy - leftWall.y);
+          ctx.strokeRect(leftWall.x - 20, leftWall.y, 40, gy - leftWall.y);
+          ctx.fillRect(rightWall.x - 20, rightWall.y, 40, gy - rightWall.y);
+          ctx.strokeRect(rightWall.x - 20, rightWall.y, 40, gy - rightWall.y);
+        } else if (state.presetId === `water-tower`) {
+          // Subtle tank silhouette centered between nodes g, h, i
+          const g = state.nodes.find(function (n) { return n.x < 0 && n.restY >= 5.5; });
+          const h = state.nodes.find(function (n) { return n.x > 0 && n.restY >= 5.5; });
+          if (g && h) {
+            const pg = worldToScreen(g.x, g.y);
+            const ph = worldToScreen(h.x, h.y);
+            ctx.save();
+            ctx.fillStyle = PALETTE.tension;
+            ctx.globalAlpha = 0.12;
+            ctx.fillRect(pg.x, pg.y - 36, ph.x - pg.x, 36);
+            ctx.restore();
+          }
+        }
+      }
+
+      function drawWindIndicators() {
+        const dir = state.windKN > 0 ? 1 : -1;
+        const startX = dir > 0 ? 22 : viewMetrics.width - 22;
+        const arrowLen = Math.min(72, 20 + Math.abs(state.windKN) * 1.6);
+        ctx.save();
+        ctx.strokeStyle = PALETTE.tension;
+        ctx.fillStyle = PALETTE.tension;
+        ctx.lineWidth = 2.5;
+        for (let k = 0; k < 3; k++) {
+          const wy = viewMetrics.originY - (2 + k * 2.1) * viewMetrics.scale;
+          const x2 = startX + dir * arrowLen;
+          ctx.beginPath();
+          ctx.moveTo(startX, wy);
+          ctx.lineTo(x2, wy);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(x2, wy);
+          ctx.lineTo(x2 - dir * 8, wy - 5);
+          ctx.lineTo(x2 - dir * 8, wy + 5);
+          ctx.closePath();
+          ctx.fill();
+        }
+        drawCanvasBadge(startX + dir * (arrowLen * 0.5 + 10), viewMetrics.originY - 7.2 * viewMetrics.scale, `WIND ${Math.abs(state.windKN)} kN`, PALETTE.tension, PALETTE.white);
+        ctx.restore();
+      }
+
+      function drawBeam(b, pa, pb, isSelected, isHovered) {
+        const dx = pb.x - pa.x;
+        const dy = pb.y - pa.y;
+        const lenPx = Math.hypot(dx, dy) || 1;
+        const nx = -dy / lenPx;
+        const ny = dx / lenPx;
+        const baseThickness = state.profile === `ibeam` ? 9 : 6;
+        const color = getBeamColor(b);
+
+        if (b.state === `fractured`) {
+          // Draw two snapped jagged halves drooping slightly
+          const midX = (pa.x + pb.x) * 0.5;
+          const midY = (pa.y + pb.y) * 0.5 + 14;
+          ctx.save();
+          ctx.strokeStyle = PALETTE.error;
+          ctx.lineWidth = baseThickness;
+          ctx.lineCap = `butt`;
+          ctx.beginPath();
+          ctx.moveTo(pa.x, pa.y);
+          ctx.lineTo(midX - dx * 0.08, midY);
+          ctx.moveTo(pb.x, pb.y);
+          ctx.lineTo(midX + dx * 0.08, midY + 4);
+          ctx.stroke();
+          drawCanvasBadge(midX, midY - 14, `FRACTURE`, PALETTE.error, PALETTE.white);
+          ctx.restore();
+          return;
+        }
+
+        // Control point for buckling or flexing bow
+        const bowPx = (b.state === `buckling` ? b.buckleBow * b.buckleDir : b.flexBow) * viewMetrics.scale;
+        const cx = (pa.x + pb.x) * 0.5 + nx * bowPx * 2;
+        const cy = (pa.y + pb.y) * 0.5 + ny * bowPx * 2;
+
+        // Selection halo
+        if (isSelected || isHovered) {
+          ctx.save();
+          ctx.strokeStyle = PALETTE.yellow;
+          ctx.lineWidth = baseThickness + 8;
+          ctx.lineCap = `round`;
+          ctx.beginPath();
+          ctx.moveTo(pa.x, pa.y);
+          ctx.quadraticCurveTo(cx, cy, pb.x, pb.y);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // Outer black structural outline (Bauhaus precision)
+        ctx.save();
+        ctx.strokeStyle = PALETTE.ink;
+        ctx.lineWidth = baseThickness + 3;
+        ctx.lineCap = `butt`;
+        ctx.beginPath();
+        ctx.moveTo(pa.x, pa.y);
+        ctx.quadraticCurveTo(cx, cy, pb.x, pb.y);
+        ctx.stroke();
+
+        // Inner force colour fill
+        ctx.strokeStyle = color;
+        ctx.lineWidth = baseThickness - 1;
+        ctx.beginPath();
+        ctx.moveTo(pa.x, pa.y);
+        ctx.quadraticCurveTo(cx, cy, pb.x, pb.y);
+        ctx.stroke();
+        ctx.restore();
+
+        // Force direction arrows (inward for compression, outward for tension)
+        if (state.overlays.arrows && b.role !== `neutral` && lenPx > 46) {
+          const midX = 0.25 * pa.x + 0.5 * cx + 0.25 * pb.x;
+          const midY = 0.25 * pa.y + 0.5 * cy + 0.25 * pb.y;
+          const ux = dx / lenPx;
+          const uy = dy / lenPx;
+          drawForceArrows(midX, midY, ux, uy, b.role);
+        }
+
+        // Failure state badges on the beam
+        if (b.state === `buckling` || b.state === `flexing`) {
+          const mx = 0.25 * pa.x + 0.5 * cx + 0.25 * pb.x;
+          const my = 0.25 * pa.y + 0.5 * cy + 0.25 * pb.y;
+          const tagText = b.state === `buckling` ? `BUCKLING` : `FLEXING`;
+          const bg = b.state === `buckling` ? PALETTE.error : PALETTE.yellow;
+          const fg = b.state === `buckling` ? PALETTE.white : PALETTE.ink;
+          drawCanvasBadge(mx, my - 14, tagText, bg, fg);
+        }
+      }
+
+      function drawForceArrows(mx, my, ux, uy, role) {
+        const sign = role === `strut` ? 1 : -1; // strut arrows point inward toward centre; tie arrows point outward
+        const offset = 15;
+        ctx.save();
+        ctx.fillStyle = PALETTE.white;
+        ctx.strokeStyle = PALETTE.ink;
+        ctx.lineWidth = 1.5;
+
+        [-1, 1].forEach(function (side) {
+          const tipX = mx + side * (role === `strut` ? 4 : offset + 6) * ux;
+          const tipY = my + side * (role === `strut` ? 4 : offset + 6) * uy;
+          const dirX = -side * sign * ux;
+          const dirY = -side * sign * uy;
+          const px = -dirY;
+          const py = dirX;
+
+          ctx.beginPath();
+          ctx.moveTo(tipX, tipY);
+          ctx.lineTo(tipX - dirX * 8 + px * 4.5, tipY - dirY * 8 + py * 4.5);
+          ctx.lineTo(tipX - dirX * 8 - px * 4.5, tipY - dirY * 8 - py * 4.5);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+        });
+        ctx.restore();
+      }
+
+      function drawNode(n, p, isSelected, isHovered) {
+        // Point load arrow above node
+        const loadKN = n.loadKN * (state.loadMultiplier / 100);
+        if (loadKN > 0.5) {
+          const arrowH = Math.min(54, 22 + loadKN * 0.5);
+          ctx.save();
+          ctx.strokeStyle = PALETTE.ink;
+          ctx.fillStyle = PALETTE.yellow;
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y - arrowH);
+          ctx.lineTo(p.x, p.y - 10);
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y - 8);
+          ctx.lineTo(p.x - 6, p.y - 18);
+          ctx.lineTo(p.x + 6, p.y - 18);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+
+          drawCanvasBadge(p.x, p.y - arrowH - 11, `${loadKN.toFixed(0)} kN`, PALETTE.yellow, PALETTE.ink);
+          ctx.restore();
+        }
+
+        // Support symbol (Triangle anchor for pinned, triangle on wheels for roller, flat pad for resting)
+        if (n.support === `pinned`) {
+          ctx.save();
+          ctx.fillStyle = PALETTE.ink;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y + 4);
+          ctx.lineTo(p.x - 12, p.y + 18);
+          ctx.lineTo(p.x + 12, p.y + 18);
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+        } else if (n.support === `roller`) {
+          ctx.save();
+          ctx.fillStyle = PALETTE.ink;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y + 4);
+          ctx.lineTo(p.x - 10, p.y + 15);
+          ctx.lineTo(p.x + 10, p.y + 15);
+          ctx.closePath();
+          ctx.fill();
+          ctx.fillStyle = PALETTE.white;
+          ctx.strokeStyle = PALETTE.ink;
+          ctx.lineWidth = 2;
+          [-6, 6].forEach(function (rx) {
+            ctx.beginPath();
+            ctx.arc(p.x + rx, p.y + 19, 3.2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+          });
+          ctx.restore();
+        } else if (n.support === `resting`) {
+          ctx.save();
+          ctx.fillStyle = PALETTE.yellow;
+          ctx.strokeStyle = PALETTE.ink;
+          ctx.lineWidth = 2;
+          ctx.fillRect(p.x - 12, p.y + 5, 24, 8);
+          ctx.strokeRect(p.x - 12, p.y + 5, 24, 8);
+          ctx.restore();
+        }
+
+        // Joint pin circle
+        ctx.save();
+        ctx.fillStyle = isSelected ? PALETTE.yellow : (isHovered ? PALETTE.tension : PALETTE.white);
+        ctx.strokeStyle = PALETTE.ink;
+        ctx.lineWidth = isSelected ? 3.5 : 2.5;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, isSelected ? 8 : 6.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawAngleOverlays(nodeMap) {
+        // Draw angle arc & degree label for selected beam or every triangle's main angles cleanly
+        if (state.selectedBeamId) {
+          const b = state.beams.find(function (m) { return m.id === state.selectedBeamId; });
+          if (b) {
+            const na = nodeMap.get(b.a);
+            const nb = nodeMap.get(b.b);
+            if (na && nb) {
+              const lower = na.y <= nb.y ? na : nb;
+              const upper = na.y <= nb.y ? nb : na;
+              const pl = worldToScreen(lower.x, lower.y);
+              const pu = worldToScreen(upper.x, upper.y);
+              const rawAng = Math.atan2(pu.y - pl.y, pu.x - pl.x); // screen coords (y down)
+              const dirSign = pu.x >= pl.x ? 1 : -1;
+
+              ctx.save();
+              ctx.strokeStyle = PALETTE.ink;
+              ctx.lineWidth = 1.5;
+              ctx.setLineDash([4, 3]);
+              ctx.beginPath();
+              ctx.moveTo(pl.x, pl.y);
+              ctx.lineTo(pl.x + dirSign * 42, pl.y);
+              ctx.stroke();
+
+              ctx.setLineDash([]);
+              ctx.strokeStyle = PALETTE.tension;
+              ctx.lineWidth = 2.5;
+              ctx.beginPath();
+              const startA = dirSign > 0 ? 0 : Math.PI;
+              ctx.arc(pl.x, pl.y, 26, startA, rawAng, dirSign > 0);
+              ctx.stroke();
+
+              drawCanvasBadge(pl.x + dirSign * 46, pl.y - 14, `θ = ${b.angleDeg.toFixed(1)}°`, PALETTE.white, PALETTE.ink);
+              ctx.restore();
+            }
+          }
+        }
+      }
+
+      function drawCanvasBadge(x, y, text, bg, fg) {
+        ctx.save();
+        ctx.font = `700 11px "Space Grotesk", sans-serif`;
+        const padX = 6;
+        const tw = ctx.measureText(text).width;
+        const bw = tw + padX * 2;
+        const bh = 19;
+        const bx = Math.max(4, Math.min(viewMetrics.width - bw - 4, x - bw * 0.5));
+        const by = Math.max(4, Math.min(viewMetrics.height - bh - 4, y - bh * 0.5));
+        ctx.fillStyle = bg;
+        ctx.strokeStyle = PALETTE.ink;
+        ctx.lineWidth = 2;
+        ctx.fillRect(bx, by, bw, bh);
+        ctx.strokeRect(bx, by, bw, bh);
+        ctx.fillStyle = fg;
+        ctx.textAlign = `center`;
+        ctx.textBaseline = `middle`;
+        ctx.fillText(text, bx + bw * 0.5, by + bh * 0.5 + 0.5);
+        ctx.restore();
+      }
+
+      /* ---------------------------------------------------------
+       * 7. POINTER INTERACTION (NODES, BEAMS, LOAD, ERASE)
+       * --------------------------------------------------------- */
+      function hitTestNode(wx, wy) {
+        let best = null;
+        let bestDist = 0.42;
+        state.nodes.forEach(function (n) {
+          const d = Math.hypot(n.x - wx, n.y - wy);
+          if (d < bestDist) {
+            bestDist = d;
+            best = n;
+          }
+        });
+        return best;
+      }
+
+      function distToSegment(px, py, ax, ay, bx, by) {
+        const vx = bx - ax;
+        const vy = by - ay;
+        const lenSq = vx * vx + vy * vy || 0.0001;
+        let t = ((px - ax) * vx + (py - ay) * vy) / lenSq;
+        t = Math.max(0, Math.min(1, t));
+        return Math.hypot(px - (ax + t * vx), py - (ay + t * vy));
+      }
+
+      function hitTestBeam(wx, wy) {
+        const nodeMap = new Map();
+        state.nodes.forEach(function (n) { nodeMap.set(n.id, n); });
+        let best = null;
+        let bestDist = 0.32;
+        state.beams.forEach(function (b) {
+          const na = nodeMap.get(b.a);
+          const nb = nodeMap.get(b.b);
+          if (!na || !nb) return;
+          const d = distToSegment(wx, wy, na.x, na.y, nb.x, nb.y);
+          if (d < bestDist) {
+            bestDist = d;
+            best = b;
+          }
+        });
+        return best;
+      }
+
+      function createNodeAt(sx, sy) {
+        const existing = state.nodes.find(function (n) {
+          return Math.hypot(n.restX - sx, n.restY - sy) < 0.2;
+        });
+        if (existing) return existing;
+
+        const support = sy <= 0.05 ? state.baseMode : `none`;
+        const node = {
+          id: genId(`n`),
+          restX: sx,
+          restY: sy,
+          x: sx,
+          y: sy,
+          vx: 0,
+          vy: 0,
+          fx: 0,
+          fy: 0,
+          support: support,
+          loadKN: 0,
+          mass: 120
+        };
+        state.nodes.push(node);
+        return node;
+      }
+
+      function addBeamBetween(nodeAId, nodeBId) {
+        if (nodeAId === nodeBId) return false;
+        const dup = state.beams.some(function (b) {
+          return (b.a === nodeAId && b.b === nodeBId) || (b.a === nodeBId && b.b === nodeAId);
+        });
+        if (dup) {
+          showToast(`A steel beam already connects those two joints.`);
+          return false;
+        }
+        const beam = {
+          id: genId(`b`),
+          a: nodeAId,
+          b: nodeBId,
+          restLen: 1,
+          axialForceKN: 0,
+          stressRatio: 0,
+          role: `neutral`,
+          state: `ok`,
+          buckleBow: 0,
+          flexBow: 0,
+          buckleDir: state.beams.length % 2 === 0 ? 1 : -1,
+          buckledLatch: false
+        };
+        state.beams.push(beam);
+        state.selectedBeamId = beam.id;
+        state.selectedNodeId = null;
+        return true;
+      }
+
+      function attachCanvasListeners() {
+        if (!canvas) return;
+
+        canvas.addEventListener(`pointermove`, function (ev) {
+          const rect = canvas.getBoundingClientRect();
+          const sx = ev.clientX - rect.left;
+          const sy = ev.clientY - rect.top;
+          const wpt = screenToWorld(sx, sy);
+          state.pointerWorld = { x: wpt.x, y: wpt.y, inside: true };
+
+          if (state.draggingNodeId) {
+            const dn = state.nodes.find(function (n) { return n.id === state.draggingNodeId; });
+            if (dn) {
+              const nx = Math.max(WORLD_BOUNDS.minX + 0.5, Math.min(WORLD_BOUNDS.maxX - 0.5, snapVal(wpt.x)));
+              const ny = Math.max(0, Math.min(WORLD_BOUNDS.maxY - 0.5, snapVal(wpt.y)));
+              if (nx !== dn.restX || ny !== dn.restY) {
+                dn.restX = nx;
+                dn.restY = ny;
+                resetNodesToRest();
+                syncAllUI();
+              }
+            }
+            return;
+          }
+
+          const hn = hitTestNode(wpt.x, wpt.y);
+          state.hoverNodeId = hn ? hn.id : null;
+          const hb = hn ? null : hitTestBeam(wpt.x, wpt.y);
+          state.hoverBeamId = hb ? hb.id : null;
+        });
+
+        canvas.addEventListener(`pointerleave`, function () {
+          state.pointerWorld.inside = false;
+          state.hoverNodeId = null;
+          state.hoverBeamId = null;
+          state.draggingNodeId = null;
+        });
+
+        canvas.addEventListener(`pointerup`, function () {
+          if (state.draggingNodeId) {
+            state.draggingNodeId = null;
+            scheduleSave();
+          }
+        });
+
+        canvas.addEventListener(`pointerdown`, function (ev) {
+          const rect = canvas.getBoundingClientRect();
+          const sx = ev.clientX - rect.left;
+          const sy = ev.clientY - rect.top;
+          const wpt = screenToWorld(sx, sy);
+          const gx = Math.max(WORLD_BOUNDS.minX + 0.5, Math.min(WORLD_BOUNDS.maxX - 0.5, snapVal(wpt.x)));
+          const gy = Math.max(0, Math.min(WORLD_BOUNDS.maxY - 0.5, snapVal(wpt.y)));
+
+          const hitN = hitTestNode(wpt.x, wpt.y);
+          const hitB = hitN ? null : hitTestBeam(wpt.x, wpt.y);
+
+          if (state.tool === `select`) {
+            if (hitN) {
+              state.selectedNodeId = hitN.id;
+              state.selectedBeamId = null;
+              if (!state.running) {
+                pushUndo();
+                state.draggingNodeId = hitN.id;
+              }
+              showToast(`Selected joint (${hitN.restX.toFixed(1)} m, ${hitN.restY.toFixed(1)} m).`);
+            } else if (hitB) {
+              state.selectedBeamId = hitB.id;
+              state.selectedNodeId = null;
+              showToast(`Inspecting member ${hitB.id.toUpperCase()} — angle ${hitB.angleDeg.toFixed(1)}°.`);
+            } else {
+              state.selectedBeamId = null;
+              state.selectedNodeId = null;
+            }
+            syncAllUI();
+            return;
+          }
+
+          if (state.tool === `node`) {
+            pushUndo();
+            resetNodesToRest();
+            const n = createNodeAt(gx, gy);
+            state.selectedNodeId = n.id;
+            state.selectedBeamId = null;
+            rebuildTopology();
+            showToast(`Joint placed at (${n.restX.toFixed(1)} m, ${n.restY.toFixed(1)} m).`);
+            syncAllUI();
+            scheduleSave();
+            return;
+          }
+
+          if (state.tool === `beam`) {
+            if (!state.beamStartNodeId) {
+              let startN = hitN;
+              if (!startN) {
+                pushUndo();
+                resetNodesToRest();
+                startN = createNodeAt(gx, gy);
+                rebuildTopology();
+              }
+              state.beamStartNodeId = startN.id;
+              showToast(`Select or click second joint to weld steel beam.`);
+            } else {
+              pushUndo();
+              resetNodesToRest();
+              let endN = hitN;
+              if (!endN) {
+                endN = createNodeAt(gx, gy);
+              }
+              if (addBeamBetween(state.beamStartNodeId, endN.id)) {
+                rebuildTopology();
+                showToast(`Steel beam constructed (${state.triangles.length} triangles total).`);
+                scheduleSave();
+              }
+              state.beamStartNodeId = null;
+            }
+            syncAllUI();
+            return;
+          }
+
+          if (state.tool === `load`) {
+            if (hitN) {
+              if (hitN.support !== `none`) {
+                showToast(`Ground support joints transmit load directly to the foundation.`);
+                return;
+              }
+              pushUndo();
+              hitN.loadKN = hitN.loadKN >= 60 ? 0 : hitN.loadKN + 15;
+              state.selectedNodeId = hitN.id;
+              state.selectedBeamId = null;
+              showToast(`Joint load updated to ${hitN.loadKN} kN.`);
+              syncAllUI();
+              scheduleSave();
+            } else {
+              showToast(`Click an upper joint to add or cycle vertical load.`);
+            }
+            return;
+          }
+
+          if (state.tool === `erase`) {
+            if (hitN) {
+              pushUndo();
+              resetNodesToRest();
+              state.nodes = state.nodes.filter(function (n) { return n.id !== hitN.id; });
+              state.beams = state.beams.filter(function (b) { return b.a !== hitN.id && b.b !== hitN.id; });
+              if (state.selectedNodeId === hitN.id) state.selectedNodeId = null;
+              rebuildTopology();
+              showToast(`Removed joint and connected beams.`);
+              syncAllUI();
+              scheduleSave();
+            } else if (hitB) {
+              pushUndo();
+              resetNodesToRest();
+              state.beams = state.beams.filter(function (b) { return b.id !== hitB.id; });
+              if (state.selectedBeamId === hitB.id) state.selectedBeamId = null;
+              rebuildTopology();
+              showToast(`Removed steel beam.`);
+              syncAllUI();
+              scheduleSave();
+            }
+          }
+        });
+      }
+
+      /* ---------------------------------------------------------
+       * 8. UI SYNC & TELEMETRY UPDATES
+       * --------------------------------------------------------- */
+      function showToast(msg) {
+        const el = document.getElementById(`canvas-toast`);
+        if (el) el.textContent = msg;
+      }
+
+      function syncAllUI() {
+        updateHud();
+        updateVerdictPanel();
+        updateInspectorPanel();
+        updateStressTable();
+        renderChallengeCards();
+      }
+
+      function updateHud() {
+        const modeChip = document.getElementById(`hud-mode-chip`);
+        if (modeChip) {
+          modeChip.className = `hud-chip`;
+          if (state.running) {
+            if (state.metrics.bucklingCount || state.metrics.fractureCount || state.metrics.isToppling) {
+              modeChip.classList.add(`hud-chip-fail`);
+              modeChip.textContent = `FAILURE DETECTED · ${state.gravityScale.toFixed(1)}G`;
+            } else {
+              modeChip.classList.add(`hud-chip-live`);
+              modeChip.textContent = `LIVE PHYSICS · ${state.gravityScale.toFixed(1)}G`;
+            }
+          } else {
+            modeChip.textContent = `PAUSED (EDIT BLUEPRINT)`;
+          }
+        }
+
+        const triChip = document.getElementById(`hud-triangles-chip`);
+        if (triChip) {
+          triChip.textContent = `TRIANGLES: ${state.metrics.triangleCount} · BASE: ${state.metrics.baseWidth.toFixed(1)} m`;
+        }
+
+        const simBtnText = document.getElementById(`sim-btn-text`);
+        if (simBtnText) {
+          simBtnText.textContent = state.running ? `Pause Physics` : `Run Physics`;
+        }
+      }
+
+      function updateVerdictPanel() {
+        const m = state.metrics;
+        const badge = document.getElementById(`verdict-badge`);
+        const title = document.getElementById(`verdict-title`);
+
+        if (badge && title) {
+          badge.className = `status-stamp`;
+          if (m.isToppling) {
+            badge.classList.add(`status-fail`);
+            badge.textContent = `TOPPLING`;
+            title.textContent = `Structure Toppling Over`;
+          } else if (m.fractureCount > 0) {
+            badge.classList.add(`status-fail`);
+            badge.textContent = `FRACTURED`;
+            title.textContent = `Steel Member Snapped`;
+          } else if (m.bucklingCount > 0) {
+            badge.classList.add(`status-fail`);
+            badge.textContent = `BUCKLING`;
+            title.textContent = `Compression Strut Buckled`;
+          } else if (m.flexingCount > 0) {
+            badge.classList.add(`status-warn`);
+            badge.textContent = `FLEXING`;
+            title.textContent = `Unbraced Frame Bending`;
+          } else if (m.peakStress >= 80) {
+            badge.classList.add(`status-warn`);
+            badge.textContent = `HIGH STRESS`;
+            title.textContent = `Approaching Yield Limit`;
+          } else {
+            badge.classList.add(`status-stable`);
+            badge.textContent = `STABLE`;
+            title.textContent = m.triangleCount > 0 ? `Triangulated & Stable` : `Standing (Low Load)`;
+          }
+        }
+
+        const kStress = document.getElementById(`kpi-peak-stress`);
+        if (kStress) kStress.textContent = `${Math.min(999, Math.round(m.peakStress))}%`;
+        const kDefl = document.getElementById(`kpi-deflection`);
+        if (kDefl) kDefl.textContent = `${Math.round(m.maxDeflectionMM)} mm`;
+        const kLoad = document.getElementById(`kpi-total-load`);
+        if (kLoad) kLoad.textContent = `${m.totalLoadKN.toFixed(0)} kN`;
+
+        setFailSensor(`fail-buckling`, `count-buckling`, m.bucklingCount, m.bucklingCount > 0);
+        setFailSensor(`fail-flexing`, `count-flexing`, m.flexingCount, m.flexingCount > 0);
+        setFailSensor(`fail-fracture`, `count-fracture`, m.fractureCount, m.fractureCount > 0);
+        setFailSensor(`fail-toppling`, `state-toppling`, m.isToppling ? `TIP` : `SAFE`, m.isToppling);
+      }
+
+      function setFailSensor(boxId, valId, text, tripped) {
+        const box = document.getElementById(boxId);
+        const val = document.getElementById(valId);
+        if (box) box.classList.toggle(`is-tripped`, Boolean(tripped));
+        if (val) val.textContent = String(text);
+      }
+
+      function updateInspectorPanel() {
+        const titleEl = document.getElementById(`insp-title`);
+        const fEl = document.getElementById(`insp-force`);
+        const aEl = document.getElementById(`insp-angle`);
+        const bEl = document.getElementById(`insp-buckling`);
+        const mEl = document.getElementById(`insp-multiplier`);
+        const mathEl = document.getElementById(`insp-math`);
+        const nodeEd = document.getElementById(`node-editor`);
+
+        // Auto-pick highest-stress beam if nothing selected
+        let targetBeam = state.beams.find(function (b) { return b.id === state.selectedBeamId; });
+        const targetNode = state.nodes.find(function (n) { return n.id === state.selectedNodeId; });
+
+        if (!targetBeam && !targetNode && state.beams.length > 0) {
+          targetBeam = state.beams.reduce(function (best, cur) {
+            return cur.stressRatio > best.stressRatio ? cur : best;
+          }, state.beams[0]);
+        }
+
+        if (targetNode) {
+          if (nodeEd) nodeEd.style.display = `block`;
+          const loadIn = document.getElementById(`node-load-input`);
+          const supSel = document.getElementById(`node-support-select`);
+          if (loadIn) loadIn.value = targetNode.loadKN;
+          if (supSel) supSel.value = targetNode.support;
+
+          if (titleEl) titleEl.textContent = `Joint ${targetNode.id.toUpperCase()} (${targetNode.restX.toFixed(1)} m, ${targetNode.restY.toFixed(1)} m)`;
+          if (fEl) fEl.textContent = `${(targetNode.loadKN * state.loadMultiplier / 100).toFixed(1)} kN`;
+          if (aEl) aEl.textContent = targetNode.support === `pinned` ? `Bolted` : (targetNode.support === `resting` ? `Resting` : `Free`);
+          if (bEl) bEl.textContent = `${Math.round(Math.hypot(targetNode.x - targetNode.restX, targetNode.y - targetNode.restY) * 1000)} mm`;
+          if (mEl) mEl.textContent = `${state.beams.filter(function (b) { return b.a === targetNode.id || b.b === targetNode.id; }).length} beams`;
+          if (mathEl) {
+            mathEl.textContent = targetNode.support === `resting`
+              ? `Resting feet support downward compression only. If the Centre of Gravity moves outside the base footprint, the windward foot lifts and the tower topples over.`
+              : `Adjust vertical load (kN) or joint support type above to test how loads travel through connected triangles.`;
+          }
+          return;
+        }
+
+        if (nodeEd) nodeEd.style.display = `none`;
+
+        if (targetBeam) {
+          const roleText = targetBeam.role === `strut` ? `Strut (Compression)` : (targetBeam.role === `tie` ? `Tie (Tension)` : `Neutral / Redundant`);
+          const sinTheta = Math.sin(Math.max(5, targetBeam.angleDeg) * Math.PI / 180);
+          const mult = 1 / sinTheta;
+
+          if (titleEl) titleEl.textContent = `Member ${targetBeam.id.toUpperCase()} · ${roleText}`;
+          if (fEl) fEl.textContent = `${Math.abs(targetBeam.axialForceKN).toFixed(1)} kN`;
+          if (aEl) aEl.textContent = `${targetBeam.angleDeg.toFixed(1)}°`;
+          if (bEl) bEl.textContent = `${targetBeam.restLen.toFixed(2)} m / ${targetBeam.bucklingLimitKN.toFixed(0)} kN`;
+          if (mEl) mEl.textContent = `${mult.toFixed(2)}×`;
+
+          if (mathEl) {
+            if (targetBeam.angleDeg < 5) {
+              mathEl.textContent = `Horizontal chord (θ ≈ 0°): carries axial bending/chord tension or compression across the span. Length ${targetBeam.restLen.toFixed(2)} m; Euler buckling limit ${targetBeam.bucklingLimitKN.toFixed(1)} kN.`;
+            } else {
+              mathEl.textContent = `F_axial = F_vert / sin(${targetBeam.angleDeg.toFixed(1)}°) = ${mult.toFixed(2)}× vertical load. ${targetBeam.angleDeg < 30 ? `Shallow angle multiplies stress! Steepening towards 45°–60° reduces axial force.` : `Effective triangulation angle.`}`;
+            }
+          }
+        } else {
+          if (titleEl) titleEl.textContent = `No members yet`;
+          if (fEl) fEl.textContent = `—`;
+          if (aEl) aEl.textContent = `—`;
+          if (bEl) bEl.textContent = `—`;
+          if (mEl) mEl.textContent = `—`;
+        }
+      }
+
+      let lastTableSignature = ``;
+
+      function updateStressTable() {
+        const tbody = document.getElementById(`stress-table-body`);
+        const countEl = document.getElementById(`table-summary-count`);
+        if (countEl) countEl.textContent = `${state.beams.length} Members Analysed`;
+        if (!tbody) return;
+
+        if (state.beams.length === 0) {
+          lastTableSignature = ``;
+          tbody.innerHTML = `<tr><td colspan="9">No steel beams constructed yet. Select Build Beam to connect joints.</td></tr>`;
+          return;
+        }
+
+        const sig = state.beams.map(function (b) { return b.id; }).join(`,`);
+        if (sig !== lastTableSignature) {
+          lastTableSignature = sig;
+          tbody.innerHTML = state.beams.map(function (b) {
+            return `<tr data-beam-id="${b.id}" onclick="selectBeamFromTable('${b.id}')">
+              <td><strong>${b.id.toUpperCase()}</strong></td>
+              <td data-col="role"></td>
+              <td class="num" data-col="len"></td>
+              <td class="num" data-col="ang"></td>
+              <td class="num" data-col="mult"></td>
+              <td class="num" data-col="force"></td>
+              <td class="num" data-col="buck"></td>
+              <td class="num" data-col="pct"></td>
+              <td data-col="cond"></td>
+            </tr>`;
+          }).join(``);
+        }
+
+        state.beams.forEach(function (b) {
+          const row = tbody.querySelector(`tr[data-beam-id="${b.id}"]`);
+          if (!row) return;
+          const sinT = Math.sin(Math.max(5, b.angleDeg) * Math.PI / 180);
+          const mult = b.angleDeg < 5 ? `Chord` : `${(1 / sinT).toFixed(2)}×`;
+          const pct = Math.min(999, Math.round(b.stressRatio * 100));
+          const roleLabel = b.role === `strut` ? `Strut (Comp.)` : (b.role === `tie` ? `Tie (Tens.)` : `Neutral`);
+          const swatchClass = b.role === `strut` ? `swatch-red` : (b.role === `tie` ? `swatch-blue` : `swatch-neutral`);
+          const condLabel = b.state === `ok` ? `Safe` : b.state.toUpperCase();
+
+          row.classList.toggle(`row-selected`, b.id === state.selectedBeamId);
+
+          const cRole = row.querySelector(`[data-col="role"]`);
+          const cLen = row.querySelector(`[data-col="len"]`);
+          const cAng = row.querySelector(`[data-col="ang"]`);
+          const cMult = row.querySelector(`[data-col="mult"]`);
+          const cForce = row.querySelector(`[data-col="force"]`);
+          const cBuck = row.querySelector(`[data-col="buck"]`);
+          const cPct = row.querySelector(`[data-col="pct"]`);
+          const cCond = row.querySelector(`[data-col="cond"]`);
+
+          if (cRole) cRole.innerHTML = `<span class="role-tag"><span class="swatch ${swatchClass}" style="width:10px;height:10px;" aria-hidden="true"></span>${roleLabel}</span>`;
+          if (cLen) cLen.textContent = b.restLen.toFixed(2);
+          if (cAng) cAng.textContent = `${b.angleDeg.toFixed(1)}°`;
+          if (cMult) cMult.textContent = mult;
+          if (cForce) cForce.textContent = `${b.axialForceKN >= 0 ? `+` : ``}${b.axialForceKN.toFixed(1)}`;
+          if (cBuck) cBuck.textContent = b.bucklingLimitKN.toFixed(1);
+          if (cPct) cPct.innerHTML = `<strong>${pct}%</strong>`;
+          if (cCond) cCond.textContent = condLabel;
+        });
+      }
+
+      function renderChallengeCards() {
+        let done = 0;
+        [1, 2, 3, 4].forEach(function (num) {
+          const isDone = Boolean(state.challenges[`c${num}`]);
+          if (isDone) done += 1;
+          const card = document.getElementById(`chal-card-${num}`);
+          const badge = document.getElementById(`chal-status-${num}`);
+          if (card) card.classList.toggle(`is-complete`, isDone);
+          if (badge) badge.textContent = isDone ? `Completed` : `Pending`;
+        });
+        const label = document.getElementById(`challenge-progress-label`);
+        if (label) label.textContent = `${done} / 4 Completed`;
+      }
+
+      /* ---------------------------------------------------------
+       * 9. HOISTED UI HANDLERS (onclick / onchange / oninput)
+       * --------------------------------------------------------- */
+      function loadPreset(presetId) {
+        const def = buildPresetData(presetId);
+        state.presetId = presetId;
+        state.profile = def.profile;
+        state.baseMode = def.baseMode;
+        state.loadMultiplier = def.loadMultiplier;
+        state.windKN = def.windKN;
+        state.gravityScale = 1.0;
+        state.undoStack = [];
+        state.beamStartNodeId = null;
+        state.selectedBeamId = null;
+        state.selectedNodeId = null;
+        state.running = true;
+
+        const keyMap = new Map();
+        state.nodes = def.nodes.map(function (dn) {
+          const id = genId(`n`);
+          keyMap.set(dn.key, id);
+          return {
+            id: id,
+            restX: dn.x,
+            restY: dn.y,
+            x: dn.x,
+            y: dn.y,
+            vx: 0,
+            vy: 0,
+            fx: 0,
+            fy: 0,
+            support: dn.support,
+            loadKN: dn.loadKN,
+            mass: 120
+          };
+        });
+
+        state.beams = def.beams.map(function (pair, idx) {
+          return {
+            id: genId(`b`),
+            a: keyMap.get(pair[0]),
+            b: keyMap.get(pair[1]),
+            restLen: 1,
+            axialForceKN: 0,
+            stressRatio: 0,
+            role: `neutral`,
+            state: `ok`,
+            buckleBow: 0,
+            flexBow: 0,
+            buckleDir: idx % 2 === 0 ? 1 : -1,
+            buckledLatch: false
+          };
+        });
+
+        rebuildTopology();
+        syncControlInputs();
+        updatePresetButtons();
+        updateUndoBtn();
+        showToast(`Loaded preset: ${presetId.replace(/-/g, ` `)}.`);
+        syncAllUI();
+        scheduleSave();
+      }
+      window.loadPreset = loadPreset;
+
+      function updatePresetButtons() {
+        const btns = document.querySelectorAll(`#preset-strip button[data-preset]`);
+        btns.forEach(function (btn) {
+          btn.classList.toggle(`btn-active`, btn.getAttribute(`data-preset`) === state.presetId);
+        });
+      }
+
+      function syncControlInputs() {
+        const sLoad = document.getElementById(`slider-load`);
+        const nLoad = document.getElementById(`input-load`);
+        if (sLoad) sLoad.value = state.loadMultiplier;
+        if (nLoad) nLoad.value = state.loadMultiplier;
+
+        const sWind = document.getElementById(`slider-wind`);
+        const nWind = document.getElementById(`input-wind`);
+        if (sWind) sWind.value = state.windKN;
+        if (nWind) nWind.value = state.windKN;
+
+        const sGrav = document.getElementById(`slider-gravity`);
+        const nGrav = document.getElementById(`input-gravity`);
+        if (sGrav) sGrav.value = state.gravityScale;
+        if (nGrav) nGrav.value = state.gravityScale;
+
+        const selProf = document.getElementById(`select-profile`);
+        if (selProf) selProf.value = state.profile;
+        const selBase = document.getElementById(`select-base`);
+        if (selBase) selBase.value = state.baseMode;
+      }
+
+      function setTool(toolName) {
+        state.tool = toolName;
+        state.beamStartNodeId = null;
+        const tools = [`select`, `node`, `beam`, `load`, `erase`];
+        tools.forEach(function (t) {
+          const btn = document.getElementById(`tool-${t}`);
+          if (btn) btn.classList.toggle(`btn-active`, t === toolName);
+        });
+        const msgs = {
+          select: `Click any steel beam or joint to inspect forces and angle stress.`,
+          node: `Click anywhere on the grid to place a new structural joint.`,
+          beam: `Click two joints (or grid points) to construct a steel beam.`,
+          load: `Click an upper joint to add or cycle vertical load (+15 kN).`,
+          erase: `Click any joint or steel beam to remove it.`
+        };
+        showToast(msgs[toolName] || ``);
+      }
+      window.setTool = setTool;
+
+      function toggleSimulation() {
+        state.running = !state.running;
+        if (!state.running) {
+          resetNodesToRest();
+        }
+        syncAllUI();
+        scheduleSave();
+      }
+      window.toggleSimulation = toggleSimulation;
+
+      function resetDeformation() {
+        resetNodesToRest();
+        state.running = true;
+        showToast(`Structure rebuilt to undeformed rest geometry.`);
+        syncAllUI();
+      }
+      window.resetDeformation = resetDeformation;
+
+      function undoAction() {
+        if (state.undoStack.length === 0) return;
+        const snap = state.undoStack.pop();
+        state.nodes = snap.nodes.map(function (n) {
+          return {
+            id: n.id,
+            restX: n.x,
+            restY: n.y,
+            x: n.x,
+            y: n.y,
+            vx: 0,
+            vy: 0,
+            fx: 0,
+            fy: 0,
+            support: n.support,
+            loadKN: n.loadKN,
+            mass: 120
+          };
+        });
+        state.beams = snap.beams.map(function (b, idx) {
+          return {
+            id: b.id,
+            a: b.a,
+            b: b.b,
+            restLen: 1,
+            axialForceKN: 0,
+            stressRatio: 0,
+            role: `neutral`,
+            state: `ok`,
+            buckleBow: 0,
+            flexBow: 0,
+            buckleDir: idx % 2 === 0 ? 1 : -1,
+            buckledLatch: false
+          };
+        });
+        state.beamStartNodeId = null;
+        rebuildTopology();
+        updateUndoBtn();
+        showToast(`Undid last structural edit.`);
+        syncAllUI();
+        scheduleSave();
+      }
+      window.undoAction = undoAction;
+
+      function toggleOverlay(key, checked) {
+        state.overlays[key] = Boolean(checked);
+        scheduleSave();
+      }
+      window.toggleOverlay = toggleOverlay;
+
+      // Dedicated dual-input handlers (no snap-back bug)
+      function syncLoadFromSlider(val) {
+        const num = Math.max(0, Math.min(250, Number(val) || 0));
+        state.loadMultiplier = num;
+        const el = document.getElementById(`input-load`);
+        if (el) el.value = num;
+        scheduleSave();
+      }
+      window.syncLoadFromSlider = syncLoadFromSlider;
+
+      function syncLoadFromNumber(val) {
+        const num = Math.max(0, Math.min(250, Number(val) || 0));
+        state.loadMultiplier = num;
+        const el = document.getElementById(`slider-load`);
+        if (el) el.value = num;
+        scheduleSave();
+      }
+      window.syncLoadFromNumber = syncLoadFromNumber;
+
+      function syncWindFromSlider(val) {
+        const num = Math.max(-30, Math.min(30, Number(val) || 0));
+        state.windKN = num;
+        const el = document.getElementById(`input-wind`);
+        if (el) el.value = num;
+        scheduleSave();
+      }
+      window.syncWindFromSlider = syncWindFromSlider;
+
+      function syncWindFromNumber(val) {
+        const num = Math.max(-30, Math.min(30, Number(val) || 0));
+        state.windKN = num;
+        const el = document.getElementById(`slider-wind`);
+        if (el) el.value = num;
+        scheduleSave();
+      }
+      window.syncWindFromNumber = syncWindFromNumber;
+
+      function syncGravityFromSlider(val) {
+        const num = Math.max(0, Math.min(2, Number(val) || 0));
+        state.gravityScale = num;
+        const el = document.getElementById(`input-gravity`);
+        if (el) el.value = num;
+        scheduleSave();
+      }
+      window.syncGravityFromSlider = syncGravityFromSlider;
+
+      function syncGravityFromNumber(val) {
+        const num = Math.max(0, Math.min(2, Number(val) || 0));
+        state.gravityScale = num;
+        const el = document.getElementById(`slider-gravity`);
+        if (el) el.value = num;
+        scheduleSave();
+      }
+      window.syncGravityFromNumber = syncGravityFromNumber;
+
+      function changeBeamProfile(val) {
+        state.profile = val === `ibeam` ? `ibeam` : `tube`;
+        resetNodesToRest();
+        showToast(`Switched profile to ${PROFILES[state.profile].label}.`);
+        syncAllUI();
+        scheduleSave();
+      }
+      window.changeBeamProfile = changeBeamProfile;
+
+      function changeBaseMode(val) {
+        state.baseMode = val === `resting` ? `resting` : `pinned`;
+        state.nodes.forEach(function (n) {
+          if (n.support !== `none`) {
+            n.support = state.baseMode;
+          }
+        });
+        resetNodesToRest();
+        showToast(state.baseMode === `resting`
+          ? `Base feet unbolted (resting) — structure can now topple if CoG leaves base.`
+          : `Base joints bolted to concrete foundation anchors.`);
+        syncAllUI();
+        scheduleSave();
+      }
+      window.changeBaseMode = changeBaseMode;
+
+      function updateSelectedNodeLoad(val) {
+        const n = state.nodes.find(function (item) { return item.id === state.selectedNodeId; });
+        if (!n) return;
+        n.loadKN = Math.max(0, Math.min(120, Number(val) || 0));
+        syncAllUI();
+        scheduleSave();
+      }
+      window.updateSelectedNodeLoad = updateSelectedNodeLoad;
+
+      function updateSelectedNodeSupport(val) {
+        const n = state.nodes.find(function (item) { return item.id === state.selectedNodeId; });
+        if (!n) return;
+        n.support = val;
+        resetNodesToRest();
+        syncAllUI();
+        scheduleSave();
+      }
+      window.updateSelectedNodeSupport = updateSelectedNodeSupport;
+
+      function selectBeamFromTable(beamId) {
+        state.selectedBeamId = beamId;
+        state.selectedNodeId = null;
+        syncAllUI();
+      }
+      window.selectBeamFromTable = selectBeamFromTable;
+
+      function exportStructureCsv() {
+        const lines = [`Member,Role,Length_m,Angle_deg,AxialForce_kN,BucklingLimit_kN,Stress_pct,Condition`];
+        state.beams.forEach(function (b) {
+          lines.push([
+            b.id.toUpperCase(),
+            b.role,
+            b.restLen.toFixed(2),
+            b.angleDeg.toFixed(1),
+            b.axialForceKN.toFixed(2),
+            b.bucklingLimitKN.toFixed(2),
+            Math.round(b.stressRatio * 100),
+            b.state
+          ].join(`,`));
+        });
+        const csv = lines.join(`\n`);
+        if (window.notebookAppApi && typeof window.notebookAppApi.triggerFileDownload === `function`) {
+          window.notebookAppApi.triggerFileDownload({
+            content: csv,
+            contentType: `text/csv`,
+            encoding: `UTF-8`,
+            filename: `triangulation-stress-report.csv`
+          });
+          showToast(`Exported CSV stress report.`);
+        } else {
+          showToast(`CSV report prepared (${state.beams.length} rows).`);
+        }
+      }
+      window.exportStructureCsv = exportStructureCsv;
+
+      function resetAllProgress(btn) {
+        if (btn && btn.dataset.armed !== `true`) {
+          btn.dataset.armed = `true`;
+          btn.textContent = `Click again to reset`;
+          setTimeout(function () {
+            if (btn.dataset.armed === `true`) {
+              btn.dataset.armed = `false`;
+              btn.textContent = `Reset Lab`;
+            }
+          }, 4000);
+          return;
+        }
+        if (btn) {
+          btn.dataset.armed = `false`;
+          btn.textContent = `Reset Lab`;
+        }
+        state.challenges = { c1: false, c2: false, c3: false, c4: false };
+        loadPreset(`water-tower`);
+        showToast(`Lab and mission progress reset.`);
+      }
+      window.resetAllProgress = resetAllProgress;
+
+      /* ---------------------------------------------------------
+       * 10. PERSISTENCE VIA NOTEBOOK APP API
+       * --------------------------------------------------------- */
+      let saveTimer = null;
+      function scheduleSave() {
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(persistState, 350);
+      }
+
+      async function persistState() {
+        if (!window.notebookAppApi || typeof window.notebookAppApi.setAppState !== `function`) return;
+        const payload = {
+          presetId: state.presetId,
+          profile: state.profile,
+          baseMode: state.baseMode,
+          loadMultiplier: state.loadMultiplier,
+          windKN: state.windKN,
+          gravityScale: state.gravityScale,
+          overlays: state.overlays,
+          challenges: state.challenges,
+          nodes: state.nodes.map(function (n) {
+            return { id: n.id, restX: n.restX, restY: n.restY, support: n.support, loadKN: n.loadKN };
+          }),
+          beams: state.beams.map(function (b) {
+            return { id: b.id, a: b.a, b: b.b };
+          })
+        };
+        try {
+          await window.notebookAppApi.setAppState(payload);
+          const pill = document.getElementById(`save-status`);
+          if (pill) {
+            const span = pill.querySelector(`span`);
+            if (span) span.textContent = `Saved`;
+          }
+        } catch (err) {
+          // Non-fatal in preview
+        }
+      }
+
+      async function restoreSavedState() {
+        if (!window.notebookAppApi || typeof window.notebookAppApi.getAppState !== `function`) return false;
+        try {
+          const saved = await window.notebookAppApi.getAppState();
+          if (!saved || !Array.isArray(saved.nodes) || saved.nodes.length === 0) return false;
+          state.presetId = saved.presetId || `water-tower`;
+          state.profile = saved.profile === `ibeam` ? `ibeam` : `tube`;
+          state.baseMode = saved.baseMode === `resting` ? `resting` : `pinned`;
+          state.loadMultiplier = typeof saved.loadMultiplier === `number` ? saved.loadMultiplier : 100;
+          state.windKN = typeof saved.windKN === `number` ? saved.windKN : 0;
+          state.gravityScale = typeof saved.gravityScale === `number` ? saved.gravityScale : 1.0;
+          if (saved.overlays) state.overlays = saved.overlays;
+          if (saved.challenges) state.challenges = saved.challenges;
+
+          state.nodes = saved.nodes.map(function (n) {
+            return {
+              id: n.id,
+              restX: n.restX,
+              restY: n.restY,
+              x: n.restX,
+              y: n.restY,
+              vx: 0,
+              vy: 0,
+              fx: 0,
+              fy: 0,
+              support: n.support || `none`,
+              loadKN: n.loadKN || 0,
+              mass: 120
+            };
+          });
+          state.beams = (saved.beams || []).map(function (b, idx) {
+            return {
+              id: b.id,
+              a: b.a,
+              b: b.b,
+              restLen: 1,
+              axialForceKN: 0,
+              stressRatio: 0,
+              role: `neutral`,
+              state: `ok`,
+              buckleBow: 0,
+              flexBow: 0,
+              buckleDir: idx % 2 === 0 ? 1 : -1,
+              buckledLatch: false
+            };
+          });
+          rebuildTopology();
+          syncControlInputs();
+          updatePresetButtons();
+          return true;
+        } catch (err) {
+          return false;
+        }
+      }
+
+      /* ---------------------------------------------------------
+       * 11. MAIN ANIMATION LOOP & INITIALISATION
+       * --------------------------------------------------------- */
+      let animFrameId = null;
+      let uiThrottle = 0;
+
+      function mainLoop() {
+        if (state.running) {
+          stepPhysics();
+        }
+        drawCanvas();
+        uiThrottle += 1;
+        if (uiThrottle % 4 === 0) {
+          syncAllUI();
+        }
+        animFrameId = requestAnimationFrame(mainLoop);
+      }
+
+      async function initApp() {
+        if (window.lucide && typeof window.lucide.createIcons === `function`) {
+          window.lucide.createIcons();
+        }
+
+        updateCanvasSize();
+        const shell = document.getElementById(`canvas-shell`);
+        if (shell && typeof ResizeObserver !== `undefined`) {
+          const ro = new ResizeObserver(function () {
+            updateCanvasSize();
+          });
+          ro.observe(shell);
+        } else {
+          window.addEventListener(`resize`, updateCanvasSize);
+        }
+
+        window.addEventListener(`keydown`, function (ev) {
+          if (ev.key === `Escape` && state.beamStartNodeId) {
+            state.beamStartNodeId = null;
+            showToast(`Beam placement cancelled.`);
+          }
+        });
+
+        attachCanvasListeners();
+
+        const restored = await restoreSavedState();
+        if (!restored) {
+          loadPreset(`water-tower`);
+        } else {
+          syncAllUI();
+        }
+
+        // Sync overlay checkboxes
+        const cAng = document.getElementById(`chk-angles`);
+        const cArr = document.getElementById(`chk-arrows`);
+        const cCog = document.getElementById(`chk-cog`);
+        if (cAng) cAng.checked = state.overlays.angles;
+        if (cArr) cArr.checked = state.overlays.arrows;
+        if (cCog) cCog.checked = state.overlays.cog;
+
+        if (animFrameId) cancelAnimationFrame(animFrameId);
+        mainLoop();
+
+        if (window.notebookAppApi && typeof window.notebookAppApi.notifyAppReady === `function`) {
+          window.notebookAppApi.notifyAppReady();
+        }
+      }
+
+      if (document.readyState === `loading`) {
+        document.addEventListener(`DOMContentLoaded`, initApp);
+      } else {
+        initApp();
+      }
+    })();
+  </script>
+</body>
+</html>

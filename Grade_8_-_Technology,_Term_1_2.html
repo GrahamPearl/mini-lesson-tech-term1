@@ -1,0 +1,2476 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="tool">
+  <meta name="design-style" content="carbon">
+  <title>Cable Tension &amp; Anchor Pylon Balance Simulator — Grade 8 Technology</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+
+      /* Page and surfaces (Carbon) */
+      --background: #ffffff;
+      --surface-container-low: #f4f4f4;
+      --surface-container: #f4f4f4;
+      --surface-container-high: #e0e0e0;
+
+      /* Ink */
+      --on-surface: #161616;
+      --on-surface-variant: #525252;
+
+      /* Rules */
+      --outline: #8d8d8d;
+      --outline-variant: #e0e0e0;
+
+      /* Accents */
+      --primary: #0f62fe;
+      --on-primary: #ffffff;
+      --primary-container: #d0e2ff;
+      --on-primary-container: #161616;
+      --secondary: #6f6f6f;
+      --tertiary: #198038;
+      --error: #da1e28;
+      --on-error: #ffffff;
+
+      /* Data series */
+      --data-1: #0f62fe;
+      --data-2: #6929c4;
+      --data-3: #005d5d;
+      --data-4: #9f1853;
+      --data-context: #8d8d8d;
+
+      /* Fonts */
+      --font-headline: 'IBM Plex Sans', sans-serif;
+      --font-body: 'IBM Plex Sans', sans-serif;
+      --font-label: 'IBM Plex Mono', monospace;
+
+      /* Shape */
+      --rounded: 0.125rem;
+      --rounded-lg: 0.25rem;
+      --rounded-full: 0.75rem;
+
+      /* Style effects */
+      --shadow-1: 0 2px 6px rgb(0 0 0 / 0.1);
+      --shadow-2: 0 4px 12px rgb(0 0 0 / 0.12);
+      --rule: 1px solid var(--outline-variant);
+      --field-rule: 1px solid var(--outline);
+      --indicator: 2px solid var(--primary);
+
+      /* Shared semantic & state tokens */
+      --positive: var(--tertiary);
+      --positive-container: #defbe6;
+      --warning: #8a5a00;
+      --warning-container: #fcf4d6;
+      --error-container: #fff1f1;
+      --focus: var(--primary);
+      --primary-hover: color-mix(in srgb, var(--primary), var(--on-surface) 25%);
+
+      /* Schematic & material tokens (no inline hex in body) */
+      --steel-frame: #393939;
+      --steel-brace: #525252;
+      --wood-frame: #7a4b27;
+      --wood-brace: #9c663b;
+      --ground-fill: #ebebeb;
+      --ground-stroke: #6f6f6f;
+      --foundation-fill: #8d8d8d;
+      --cable-stroke: #161616;
+      --grid-stroke: #e8e8e8;
+      --optimal-zone-fill: color-mix(in srgb, var(--tertiary) 12%, var(--background));
+      --vector-lateral: var(--data-1);
+      --vector-tension: var(--data-2);
+      --vector-foundation: var(--data-3);
+      --vector-danger: var(--error);
+
+      /* Type scale (Focused Tool) */
+      --display-size: clamp(1.625rem, 1.35rem + 1.1vw, 2.125rem);
+      --headline-size: clamp(1.1875rem, 1.05rem + 0.45vw, 1.375rem);
+      --subhead-size: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+      --body-size: clamp(0.9375rem, 0.9rem + 0.15vw, 1rem);
+      --label-size: 0.75rem;
+
+      /* Spacing scale */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+
+      /* Motion */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --dur-micro: 120ms;
+      --dur-short: 220ms;
+      --dur-long: 420ms;
+    }
+
+    /* Base reset */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { overflow-x: clip; margin: 0; padding: 0; }
+    header { position: static !important; }
+
+    body {
+      background: var(--background);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input, select {
+      font-family: inherit;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .page-grid {
+      display: grid;
+      gap: var(--space-lg);
+      padding: var(--space-lg);
+      max-width: 1320px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .page-grid * { min-width: 0; }
+
+    /* Carbon Typography */
+    .label {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--on-surface-variant);
+      font-weight: 500;
+      display: block;
+    }
+
+    .headline {
+      font-family: var(--font-headline);
+      font-weight: 300;
+      font-size: var(--display-size);
+      letter-spacing: 0;
+      line-height: 1.2;
+      margin: 0;
+    }
+    .headline strong {
+      font-weight: 600;
+    }
+
+    .section-heading {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: var(--subhead-size);
+      line-height: 1.3;
+      margin: 0;
+    }
+
+    .helper-text {
+      font-size: 0.8125rem;
+      color: var(--on-surface-variant);
+      margin: 0;
+    }
+
+    /* Header */
+    .sim-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: var(--space-md);
+      padding-bottom: var(--space-md);
+      border-bottom: var(--rule);
+    }
+
+    .header-title-block {
+      display: grid;
+      gap: var(--space-xs);
+      max-width: 72ch;
+    }
+
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .progress-tag {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      border-radius: var(--rounded-full);
+      padding: var(--space-xs) var(--space-md);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      min-height: 28px;
+    }
+
+    /* Buttons (Carbon square corners) */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: 0;
+      border: 1px solid transparent;
+      font-size: 0.875rem;
+      font-weight: 400;
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out),
+                  color var(--dur-micro) var(--ease-out),
+                  border-color var(--dur-micro) var(--ease-out);
+      text-align: left;
+      white-space: nowrap;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: var(--on-primary);
+      padding-right: var(--space-xl);
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: var(--primary-hover);
+    }
+    .btn-secondary {
+      background: var(--background);
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+    .btn-ghost {
+      background: var(--surface-container);
+      color: var(--on-surface);
+      border-color: var(--outline-variant);
+    }
+    .btn-ghost:hover:not(:disabled) {
+      background: var(--surface-container-high);
+    }
+    .btn-ghost[aria-pressed="true"] {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      border-color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* Collapsible Reference Strip */
+    .reference-drawer {
+      background: var(--surface-container);
+      padding: var(--space-md);
+      border-left: 3px solid var(--primary);
+    }
+    .reference-drawer[hidden] {
+      display: none;
+    }
+    .reference-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+      gap: var(--space-md);
+      margin-top: var(--space-sm);
+    }
+    .ref-item {
+      border-top: var(--rule);
+      padding-top: var(--space-sm);
+    }
+    .ref-item p {
+      margin: var(--space-xs) 0 0 0;
+      font-size: 0.875rem;
+      color: var(--on-surface);
+    }
+
+    /* Challenge Navigation Tabs */
+    .challenge-bar {
+      display: grid;
+      gap: var(--space-sm);
+    }
+    .tab-row {
+      display: flex;
+      flex-wrap: wrap;
+      border-bottom: var(--rule);
+      gap: var(--space-xs);
+    }
+    .tab-btn {
+      background: transparent;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      padding: var(--space-sm) var(--space-md);
+      min-height: 44px;
+      font-size: 0.875rem;
+      font-weight: 400;
+      color: var(--on-surface-variant);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      transition: background-color var(--dur-micro) var(--ease-out),
+                  color var(--dur-micro) var(--ease-out);
+    }
+    .tab-btn:hover {
+      background: var(--surface-container);
+      color: var(--on-surface);
+    }
+    .tab-btn.is-active {
+      border-bottom: var(--indicator);
+      color: var(--on-surface);
+      font-weight: 600;
+    }
+    .tab-status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--outline);
+      flex-shrink: 0;
+    }
+    .tab-status-dot.is-passed {
+      background: var(--positive);
+    }
+
+    /* Challenge Brief Strip */
+    .challenge-brief {
+      background: var(--surface-container);
+      padding: var(--space-md);
+      border-left: 3px solid var(--primary);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    .challenge-brief.is-passed {
+      border-left-color: var(--positive);
+      background: var(--positive-container);
+    }
+    .challenge-criteria {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      margin-top: var(--space-xs);
+    }
+    .criterion-chip {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      padding: var(--space-xs) var(--space-sm);
+      background: var(--background);
+      border: var(--rule);
+      color: var(--on-surface-variant);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    .criterion-chip.is-met {
+      border-color: var(--positive);
+      color: var(--positive);
+      font-weight: 600;
+    }
+
+    /* Main Simulator Workspace (Asymmetric 1.6 : 1 grid) */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(320px, 1fr);
+      gap: var(--space-lg);
+      align-items: start;
+    }
+
+    .sim-stage-col {
+      display: grid;
+      gap: var(--space-md);
+    }
+
+    /* Physics Canvas Frame */
+    .canvas-shell {
+      background: var(--surface-container);
+      padding: var(--space-md);
+      display: grid;
+      gap: var(--space-sm);
+    }
+    .canvas-topbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .vector-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    .legend-swatch {
+      width: 10px;
+      height: 10px;
+      display: inline-block;
+    }
+    .swatch-lateral { background: var(--vector-lateral); }
+    .swatch-tension { background: var(--vector-tension); }
+    .swatch-foundation { background: var(--vector-foundation); }
+
+    .svg-frame {
+      background: var(--background);
+      border: var(--rule);
+      position: relative;
+      width: 100%;
+      min-height: 320px;
+    }
+    .svg-frame svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      user-select: none;
+      touch-action: none;
+    }
+
+    /* Stress Test Progress Bar */
+    .stress-bar-wrap {
+      display: grid;
+      gap: var(--space-xs);
+    }
+    .stress-bar-track {
+      height: 6px;
+      background: var(--surface-container-high);
+      width: 100%;
+      overflow: hidden;
+    }
+    .stress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      transition: width var(--dur-micro) linear;
+    }
+    .stress-bar-fill.is-pass { background: var(--positive); }
+    .stress-bar-fill.is-fail { background: var(--error); }
+
+    .action-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-sm);
+      padding-top: var(--space-xs);
+    }
+    .action-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    /* Telemetry Key-Value Tiles */
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--space-sm);
+    }
+    .key-tile {
+      background: var(--surface-container);
+      padding: var(--space-md);
+      display: grid;
+      gap: var(--space-xs);
+      border-bottom: 2px solid var(--outline-variant);
+    }
+    .key-tile.is-primary {
+      border-bottom: var(--indicator);
+    }
+    .key-tile.is-ok {
+      border-bottom-color: var(--positive);
+    }
+    .key-tile.is-warn {
+      border-bottom-color: var(--warning);
+    }
+    .key-tile.is-danger {
+      border-bottom-color: var(--error);
+    }
+    .key-value {
+      font-family: var(--font-label);
+      font-weight: 300;
+      font-size: 1.5rem;
+      line-height: 1.15;
+      color: var(--on-surface);
+      font-variant-numeric: tabular-nums;
+    }
+    .key-sub {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+    }
+    .key-sub.is-ok { color: var(--positive); font-weight: 500; }
+    .key-sub.is-warn { color: var(--warning); font-weight: 500; }
+    .key-sub.is-danger { color: var(--error); font-weight: 600; }
+
+    /* Diagnostic Feedback Box */
+    .diagnostic-box {
+      background: var(--surface-container);
+      padding: var(--space-md);
+      border-left: 4px solid var(--positive);
+      display: grid;
+      gap: var(--space-xs);
+    }
+    .diagnostic-box.state-ok {
+      border-left-color: var(--positive);
+    }
+    .diagnostic-box.state-warn {
+      border-left-color: var(--warning);
+      background: var(--warning-container);
+    }
+    .diagnostic-box.state-fail {
+      border-left-color: var(--error);
+      background: var(--error-container);
+    }
+    .diag-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .diag-badge {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .state-ok .diag-badge { color: var(--positive); }
+    .state-warn .diag-badge { color: var(--warning); }
+    .state-fail .diag-badge { color: var(--error); }
+
+    .diag-body {
+      margin: 0;
+      font-size: 0.9375rem;
+      color: var(--on-surface);
+      max-width: 70ch;
+    }
+    .diag-tip {
+      margin: 0;
+      font-size: 0.875rem;
+      color: var(--on-surface-variant);
+      border-top: var(--rule);
+      padding-top: var(--space-xs);
+    }
+
+    /* Controls Sidebar (Carbon Layer) */
+    .controls-panel {
+      background: var(--surface-container);
+      padding: var(--space-md);
+      display: grid;
+      gap: var(--space-lg);
+    }
+    .control-group {
+      display: grid;
+      gap: var(--space-sm);
+      padding-bottom: var(--space-md);
+      border-bottom: var(--rule);
+    }
+    .control-group:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    /* Segmented Radio / Option Buttons */
+    .segment-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--outline-variant);
+      border: 1px solid var(--outline-variant);
+    }
+    .segment-grid.cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .seg-btn {
+      background: var(--background);
+      color: var(--on-surface);
+      border: 0;
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-sm);
+      font-size: 0.8125rem;
+      font-weight: 400;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      transition: background-color var(--dur-micro) var(--ease-out);
+    }
+    .seg-btn:hover {
+      background: var(--surface-container-high);
+    }
+    .seg-btn[aria-pressed="true"] {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      font-weight: 600;
+      box-shadow: inset 0 -2px 0 var(--primary);
+    }
+    .seg-meta {
+      font-family: var(--font-label);
+      font-size: 0.6875rem;
+      color: var(--on-surface-variant);
+    }
+
+    /* Checkbox / Switch Rows */
+    .toggle-row {
+      background: var(--background);
+      padding: var(--space-sm) var(--space-md);
+      min-height: 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-md);
+      border-bottom: var(--field-rule);
+      cursor: pointer;
+    }
+    .toggle-row:hover {
+      background: var(--surface-container-high);
+    }
+    .toggle-info {
+      display: grid;
+      gap: 2px;
+    }
+    .toggle-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--on-surface);
+    }
+    .toggle-input {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--primary);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* Slider + Number Input Row */
+    .slider-field {
+      display: grid;
+      gap: var(--space-xs);
+    }
+    .slider-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 78px;
+      gap: var(--space-sm);
+      align-items: end;
+    }
+    input[type="range"] {
+      width: 100%;
+      height: 40px;
+      margin: 0;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+    input[type="number"] {
+      height: 40px;
+      background: var(--background);
+      color: var(--on-surface);
+      border: 0;
+      border-bottom: var(--field-rule);
+      padding: 0 var(--space-sm);
+      font-family: var(--font-label);
+      font-size: 0.9375rem;
+      text-align: right;
+      width: 100%;
+    }
+    input[type="number"]:disabled,
+    input[type="range"]:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .angle-zones {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-label);
+      font-size: 0.6875rem;
+      color: var(--on-surface-variant);
+    }
+
+    /* Utilisation Bars */
+    .margin-list {
+      display: grid;
+      gap: var(--space-sm);
+    }
+    .margin-item {
+      display: grid;
+      gap: var(--space-xs);
+    }
+    .margin-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+    }
+    .margin-track {
+      height: 8px;
+      background: var(--surface-container-high);
+      position: relative;
+    }
+    .margin-fill {
+      height: 100%;
+      background: var(--primary);
+      transition: width var(--dur-micro) var(--ease-out),
+                  background-color var(--dur-micro) var(--ease-out);
+    }
+    .margin-fill.is-ok { background: var(--positive); }
+    .margin-fill.is-warn { background: var(--warning); }
+    .margin-fill.is-danger { background: var(--error); }
+
+    /* SVG Interactive Handle */
+    .anchor-handle {
+      cursor: ew-resize;
+    }
+    .anchor-handle:hover .anchor-grip {
+      fill: var(--primary);
+    }
+    .svg-label-mono {
+      font-family: var(--font-label);
+      font-size: 11px;
+      fill: var(--on-surface);
+    }
+    .svg-label-muted {
+      font-family: var(--font-label);
+      font-size: 10px;
+      fill: var(--on-surface-variant);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 980px) {
+      .workspace-grid {
+        grid-template-columns: 1fr;
+      }
+      .telemetry-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page-grid {
+        padding: var(--space-sm);
+        gap: var(--space-md);
+      }
+      .telemetry-grid {
+        grid-template-columns: 1fr;
+      }
+      .segment-grid.cols-3 {
+        grid-template-columns: 1fr;
+      }
+      .btn {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .action-group {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-grid">
+    <!-- Header -->
+    <header class="sim-header">
+      <div class="header-title-block">
+        <span class="label">Grade 8 Technology · Term 1 · Frame Structures</span>
+        <h1 class="headline">Cable Tension &amp; <strong>Anchor Pylon Balance</strong> Simulator</h1>
+        <p class="helper-text">
+          Test how anchor guy-wire angles, internal triangulation (C), cross-bracing (B), and material choice keep an electrical pylon standing against heavy lateral cable loads (A).
+        </p>
+      </div>
+      <div class="header-actions">
+        <span class="progress-tag" id="challenge-counter" aria-live="polite">0 / 3 Challenges Passed</span>
+        <button type="button" class="btn btn-ghost" id="btn-ref-toggle" aria-expanded="false" onclick="toggleReferenceDrawer()">
+          Field Reference (A–D)
+        </button>
+        <button type="button" class="btn btn-ghost" id="btn-reset-progress" onclick="resetAllProgress(this)">
+          Reset Progress
+        </button>
+      </div>
+    </header>
+
+    <!-- Collapsible Curriculum Field Reference -->
+    <section class="reference-drawer" id="reference-drawer" hidden aria-label="Grade 8 Technology Reference">
+      <div class="canvas-topbar">
+        <h2 class="section-heading">Grade 8 Pylon Design Reference</h2>
+        <span class="label">First pylon: 14 July 1928 · Bonnyfield, Scotland</span>
+      </div>
+      <div class="reference-grid">
+        <div class="ref-item">
+          <span class="label">Structure &amp; Purpose</span>
+          <p><strong>Frame structure</strong> built from <strong>steel or wood</strong> to support heavy electrical cables over a great distance.</p>
+        </div>
+        <div class="ref-item">
+          <span class="label">A · Electrical Cables &amp; D · Foundation</span>
+          <p><strong>Cables (A)</strong> pull laterally and downwards. <strong>Foundations (D)</strong> anchor the legs to transfer compression and resist uplift.</p>
+        </div>
+        <div class="ref-item">
+          <span class="label">C · Triangulation</span>
+          <p>Triangular shapes formed by members bracing a frame make it rigid and stable because triangles resist deforming forces better than rectangles.</p>
+        </div>
+        <div class="ref-item">
+          <span class="label">B · Cross-Bracing &amp; Visual Impact</span>
+          <p>Crossing members strengthen the frame and increase load capacity. Planners also consider <strong>visual impact</strong> and community safety around pylons.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Challenge / Mode Tabs -->
+    <section class="challenge-bar" aria-label="Simulation Modes and Guided Challenges">
+      <div class="tab-row" role="tablist" aria-label="Simulation scenarios">
+        <button type="button" class="tab-btn is-active" role="tab" aria-selected="true" id="tab-sandbox" onclick="selectMode('sandbox')">
+          Free Sandbox
+        </button>
+        <button type="button" class="tab-btn" role="tab" aria-selected="false" id="tab-c1" onclick="selectMode('c1')">
+          <span class="tab-status-dot" id="dot-c1" aria-hidden="true"></span>
+          Challenge 1: Terminal Anchoring
+        </button>
+        <button type="button" class="tab-btn" role="tab" aria-selected="false" id="tab-c2" onclick="selectMode('c2')">
+          <span class="tab-status-dot" id="dot-c2" aria-hidden="true"></span>
+          Challenge 2: Triangulation &amp; Cross-Bracing
+        </button>
+        <button type="button" class="tab-btn" role="tab" aria-selected="false" id="tab-c3" onclick="selectMode('c3')">
+          <span class="tab-status-dot" id="dot-c3" aria-hidden="true"></span>
+          Challenge 3: Asymmetrical Load
+        </button>
+      </div>
+
+      <div class="challenge-brief" id="challenge-brief" hidden>
+        <div>
+          <span class="label" id="challenge-kicker">Guided Assessment Challenge</span>
+          <p class="diag-body" id="challenge-desc"></p>
+          <div class="challenge-criteria" id="challenge-criteria"></div>
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="reloadCurrentChallenge()">
+          Reload Challenge Start
+        </button>
+      </div>
+    </section>
+
+    <!-- Main Workspace -->
+    <main class="workspace-grid">
+      <!-- Left: Physics Canvas + Telemetry + Diagnostics -->
+      <div class="sim-stage-col">
+        <section class="canvas-shell" aria-label="Interactive Pylon Physics Canvas">
+          <div class="canvas-topbar">
+            <div>
+              <span class="label">Interactive Structural Elevation</span>
+              <span class="helper-text" id="drag-hint">Drag the ground anchor block (D) left or right to adjust the guy-wire angle.</span>
+            </div>
+            <div class="vector-legend" id="vector-legend">
+              <span class="legend-item"><span class="legend-swatch swatch-lateral"></span>Lateral Pull (A)</span>
+              <span class="legend-item"><span class="legend-swatch swatch-tension"></span>Anchor Tension</span>
+              <span class="legend-item"><span class="legend-swatch swatch-foundation"></span>Foundation Load (D)</span>
+            </div>
+          </div>
+
+          <div class="svg-frame">
+            <svg id="pylon-svg" viewBox="0 0 960 440" role="img" aria-label="Interactive electrical pylon structural balance diagram">
+              <defs>
+                <marker id="arrow-lateral" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--vector-lateral)"></path>
+                </marker>
+                <marker id="arrow-tension" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--vector-tension)"></path>
+                </marker>
+                <marker id="arrow-foundation" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--vector-foundation)"></path>
+                </marker>
+                <marker id="arrow-danger" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--vector-danger)"></path>
+                </marker>
+              </defs>
+              <g id="svg-grid-layer" aria-hidden="true"></g>
+              <g id="svg-ground-layer"></g>
+              <g id="svg-cables-layer"></g>
+              <g id="svg-pylon-layer"></g>
+              <g id="svg-anchor-layer"></g>
+              <g id="svg-vectors-layer"></g>
+              <g id="svg-labels-layer"></g>
+            </svg>
+          </div>
+
+          <div class="stress-bar-wrap">
+            <div class="margin-head">
+              <span class="label" id="stress-status-label">Live Equilibrium Preview — Click Run Stress Test to simulate dynamic load</span>
+              <span class="label" id="stress-pct-label">0%</span>
+            </div>
+            <div class="stress-bar-track">
+              <div class="stress-bar-fill" id="stress-bar-fill"></div>
+            </div>
+          </div>
+
+          <div class="action-toolbar">
+            <div class="action-group">
+              <button type="button" class="btn btn-primary" id="btn-run-test" onclick="runStressTest()">
+                Run Stress Test
+              </button>
+              <button type="button" class="btn btn-secondary" id="btn-reset-pylon" onclick="resetPylonState()">
+                Reset Pylon
+              </button>
+            </div>
+            <div class="action-group">
+              <button type="button" class="btn btn-ghost" id="btn-toggle-vectors" aria-pressed="true" onclick="toggleVectors()">
+                Force Vectors: On
+              </button>
+              <button type="button" class="btn btn-ghost" id="btn-toggle-labels" aria-pressed="true" onclick="toggleMemberLabels()">
+                Members A–D: On
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Telemetry Key Figures -->
+        <section class="telemetry-grid" aria-label="Structural Force Readouts">
+          <div class="key-tile is-primary" id="tile-angle">
+            <span class="label">Anchor Angle (θ)</span>
+            <span class="key-value" id="val-angle">40°</span>
+            <span class="key-sub" id="sub-angle">Optimal 30°–50°</span>
+          </div>
+          <div class="key-tile" id="tile-tension">
+            <span class="label">Guy-Wire Tension</span>
+            <span class="key-value" id="val-tension">0.0 kN</span>
+            <span class="key-sub" id="sub-tension">Max 140 kN</span>
+          </div>
+          <div class="key-tile" id="tile-shear">
+            <span class="label">Frame Shear Load</span>
+            <span class="key-value" id="val-shear">0.0 kN</span>
+            <span class="key-sub" id="sub-shear">Cap 108 kN</span>
+          </div>
+          <div class="key-tile" id="tile-foundation">
+            <span class="label">Foundation Load (D)</span>
+            <span class="key-value" id="val-foundation">35.0 kN</span>
+            <span class="key-sub" id="sub-foundation">Compression</span>
+          </div>
+        </section>
+
+        <!-- Failure Diagnostics & Educational Feedback -->
+        <section class="diagnostic-box state-ok" id="diagnostic-box" aria-live="polite">
+          <div class="diag-header">
+            <span class="diag-badge" id="diag-badge">BALANCED &amp; RIGID</span>
+            <span class="label" id="diag-mode-tag">Terminal Anchor Configuration</span>
+          </div>
+          <p class="diag-body" id="diag-message"></p>
+          <p class="diag-tip" id="diag-tip"></p>
+        </section>
+      </div>
+
+      <!-- Right: Pylon Engineering Controls -->
+      <aside class="controls-panel" aria-label="Pylon Engineering Controls">
+        <!-- Material & Frame Bracing -->
+        <div class="control-group">
+          <span class="label">1. Frame Material &amp; Bracing</span>
+          <div class="segment-grid" role="group" aria-label="Pylon frame material">
+            <button type="button" class="seg-btn" id="mat-steel" aria-pressed="true" onclick="setMaterial('steel')">
+              <span>Steel Frame</span>
+              <span class="seg-meta">High rigidity · 108 kN cap</span>
+            </button>
+            <button type="button" class="seg-btn" id="mat-wood" aria-pressed="false" onclick="setMaterial('wood')">
+              <span>Wood Frame</span>
+              <span class="seg-meta">Lighter · 68 kN cap</span>
+            </button>
+          </div>
+
+          <label class="toggle-row" for="chk-triangulation">
+            <span class="toggle-info">
+              <span class="toggle-title">Triangulation (C)</span>
+              <span class="helper-text">Diagonal braces form rigid triangles</span>
+            </span>
+            <input type="checkbox" class="toggle-input" id="chk-triangulation" checked onchange="toggleTriangulation(this.checked)">
+          </label>
+
+          <label class="toggle-row" for="chk-crossbrace">
+            <span class="toggle-info">
+              <span class="toggle-title">Cross-Bracing (B)</span>
+              <span class="helper-text">Crossing members boost load capacity</span>
+            </span>
+            <input type="checkbox" class="toggle-input" id="chk-crossbrace" checked onchange="toggleCrossBracing(this.checked)">
+          </label>
+        </div>
+
+        <!-- Ground Anchor & Angle -->
+        <div class="control-group">
+          <span class="label">2. Ground Anchor &amp; Guy-Wire</span>
+          <div class="segment-grid cols-3" role="group" aria-label="Anchor guy-wire placement">
+            <button type="button" class="seg-btn" id="anchor-right" aria-pressed="true" onclick="setAnchorSide('right')">
+              <span>Right Anchor</span>
+              <span class="seg-meta">Opposes left pull</span>
+            </button>
+            <button type="button" class="seg-btn" id="anchor-left" aria-pressed="false" onclick="setAnchorSide('left')">
+              <span>Left Anchor</span>
+              <span class="seg-meta">Opposes right pull</span>
+            </button>
+            <button type="button" class="seg-btn" id="anchor-none" aria-pressed="false" onclick="setAnchorSide('none')">
+              <span>Unanchored</span>
+              <span class="seg-meta">No guy-wire</span>
+            </button>
+          </div>
+
+          <div class="slider-field">
+            <label class="label" for="slider-angle">Anchor Cable Angle from Ground (θ°)</label>
+            <div class="slider-row">
+              <input type="range" id="slider-angle" min="15" max="75" step="1" value="40" oninput="syncAngleFromSlider(this.value)">
+              <input type="number" id="input-angle" min="15" max="75" step="1" value="40" oninput="syncAngleFromNumber(this.value)">
+            </div>
+            <div class="angle-zones">
+              <span>15° Snap (&lt;20°)</span>
+              <span>30°–50° Optimal</span>
+              <span>75° Topple (&gt;70°)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Electrical Cable Load (A) -->
+        <div class="control-group">
+          <span class="label">3. Electrical Cable Load (A)</span>
+          <div class="segment-grid" role="group" aria-label="Cable span configuration">
+            <button type="button" class="seg-btn" id="span-terminal" aria-pressed="true" onclick="setSpanMode('terminal')">
+              <span>Terminal Pylon</span>
+              <span class="seg-meta">Single-sided cable pull</span>
+            </button>
+            <button type="button" class="seg-btn" id="span-dual" aria-pressed="false" onclick="setSpanMode('dual')">
+              <span>Dual-Span</span>
+              <span class="seg-meta">Asymmetrical balance</span>
+            </button>
+          </div>
+
+          <div class="slider-field">
+            <label class="label" for="slider-load-left">Left Cable Span Load (%)</label>
+            <div class="slider-row">
+              <input type="range" id="slider-load-left" min="0" max="100" step="1" value="65" oninput="syncLoadLFromSlider(this.value)">
+              <input type="number" id="input-load-left" min="0" max="100" step="1" value="65" oninput="syncLoadLFromNumber(this.value)">
+            </div>
+          </div>
+
+          <div class="slider-field" id="right-load-wrap">
+            <label class="label" for="slider-load-right">Right Cable Span Load (%)</label>
+            <div class="slider-row">
+              <input type="range" id="slider-load-right" min="0" max="100" step="1" value="0" disabled oninput="syncLoadRFromSlider(this.value)">
+              <input type="number" id="input-load-right" min="0" max="100" step="1" value="0" disabled oninput="syncLoadRFromNumber(this.value)">
+            </div>
+          </div>
+        </div>
+
+        <!-- Structural Margin Breakdown -->
+        <div class="control-group">
+          <span class="label">4. Structural Stress Ratios (100% = Failure)</span>
+          <div class="margin-list">
+            <div class="margin-item">
+              <div class="margin-head">
+                <span>Guy-Wire Tension Limit</span>
+                <span id="pct-tension">0%</span>
+              </div>
+              <div class="margin-track">
+                <div class="margin-fill" id="bar-tension" style="width: 0%;"></div>
+              </div>
+            </div>
+            <div class="margin-item">
+              <div class="margin-head">
+                <span>Frame Shear / Buckling</span>
+                <span id="pct-shear">0%</span>
+              </div>
+              <div class="margin-track">
+                <div class="margin-fill" id="bar-shear" style="width: 0%;"></div>
+              </div>
+            </div>
+            <div class="margin-item">
+              <div class="margin-head">
+                <span>Overturning / Uplift Risk</span>
+                <span id="pct-overturn">0%</span>
+              </div>
+              <div class="margin-track">
+                <div class="margin-fill" id="bar-overturn" style="width: 0%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <api-shim></api-shim>
+
+  <script>
+    'use strict';
+
+    var SVG_NS = 'http://www.w3.org/2000/svg';
+      var GROUND_Y = 370;
+      var ATTACH_Y = 210;
+      var ATTACH_H = GROUND_Y - ATTACH_Y;
+      var CROSSARM_Y = 175;
+      var PEAK_Y = 135;
+
+      var MATERIALS = {
+        steel: {
+          name: `Steel`,
+          selfWeight: 35,
+          shearOpen: 26,
+          shearTri: 68,
+          shearCross: 76,
+          shearBoth: 108,
+          unanchoredLatCap: 22
+        },
+        wood: {
+          name: `Wood`,
+          selfWeight: 20,
+          shearOpen: 16,
+          shearTri: 42,
+          shearCross: 48,
+          shearBoth: 68,
+          unanchoredLatCap: 15
+        }
+      };
+
+      var CHALLENGES = {
+        c1: {
+          title: `Challenge 1: Terminal Pylon Anchoring`,
+          desc: `A steel terminal pylon supports heavy cables pulling laterally at 75% load. Currently the anchor angle is too shallow (16°) and risks snapping. Adjust the anchor angle into the optimal 30°–50° zone and pass the Stress Test.`,
+          preset: {
+            material: `steel`,
+            triangulation: true,
+            crossBracing: true,
+            anchorSide: `right`,
+            anchorAngle: 16,
+            spanMode: `terminal`,
+            loadLeft: 75,
+            loadRight: 0
+          }
+        },
+        c2: {
+          title: `Challenge 2: Triangulation & Cross-Bracing`,
+          desc: `This pylon is anchored at 40° under a 90% storm cable load, but its open rectangular bays lack internal bracing and use timber. Select Steel, enable Triangulation (C) and Cross-Bracing (B), and pass the Stress Test.`,
+          preset: {
+            material: `wood`,
+            triangulation: false,
+            crossBracing: false,
+            anchorSide: `right`,
+            anchorAngle: 40,
+            spanMode: `terminal`,
+            loadLeft: 90,
+            loadRight: 0
+          }
+        },
+        c3: {
+          title: `Challenge 3: Asymmetrical Cable Load Balancing`,
+          desc: `Ice loading creates an unbalanced dual-span pull: Left cables pull at 85% while Right cables pull at 25%. Position a guy-wire anchor on the opposing side at an effective angle (25°–55°) and pass the Stress Test.`,
+          preset: {
+            material: `steel`,
+            triangulation: true,
+            crossBracing: true,
+            anchorSide: `none`,
+            anchorAngle: 40,
+            spanMode: `dual`,
+            loadLeft: 85,
+            loadRight: 25
+          }
+        }
+      };
+
+      var appState = {
+        mode: `sandbox`,
+        material: `steel`,
+        triangulation: true,
+        crossBracing: true,
+        anchorSide: `right`,
+        anchorAngle: 40,
+        spanMode: `terminal`,
+        loadLeft: 65,
+        loadRight: 0,
+        showVectors: true,
+        showLabels: true,
+        passedChallenges: { c1: false, c2: false, c3: false }
+      };
+
+      var simState = {
+        running: false,
+        progress: 0,
+        loadMultiplier: 1,
+        failureType: null,
+        testPassed: false,
+        animId: null,
+        draggingAnchor: false,
+        oscPhase: 0
+      };
+
+      function byId(id) {
+        return document.getElementById(id);
+      }
+
+      function svgEl(tag, attrs) {
+        var el = document.createElementNS(SVG_NS, tag);
+        if (attrs) {
+          var keys = Object.keys(attrs);
+          for (var i = 0; i < keys.length; i++) {
+            el.setAttribute(keys[i], String(attrs[keys[i]]));
+          }
+        }
+        return el;
+      }
+
+      function clamp(val, min, max) {
+        return Math.max(min, Math.min(max, val));
+      }
+
+      function persistState() {
+        try {
+          if (window.notebookAppApi && typeof window.notebookAppApi.setAppState === `function`) {
+            window.notebookAppApi.setAppState({
+              mode: appState.mode,
+              material: appState.material,
+              triangulation: appState.triangulation,
+              crossBracing: appState.crossBracing,
+              anchorSide: appState.anchorSide,
+              anchorAngle: appState.anchorAngle,
+              spanMode: appState.spanMode,
+              loadLeft: appState.loadLeft,
+              loadRight: appState.loadRight,
+              showVectors: appState.showVectors,
+              showLabels: appState.showLabels,
+              passedChallenges: appState.passedChallenges
+            });
+          }
+        } catch (err) {
+          // Ignore persistence errors outside host
+        }
+      }
+
+      function computePhysics(multiplier) {
+        var mult = typeof multiplier === `number` ? multiplier : 1;
+        var mat = MATERIALS[appState.material] || MATERIALS.steel;
+
+        var effLoadL = appState.loadLeft * mult;
+        var effLoadR = (appState.spanMode === `dual` ? appState.loadRight : 0) * mult;
+
+        var fLeft = effLoadL * 0.9;
+        var fRight = effLoadR * 0.9;
+        var fNet = fRight - fLeft;
+        var fAbs = Math.abs(fNet);
+        var pullDir = fNet < -0.5 ? -1 : (fNet > 0.5 ? 1 : 0);
+
+        var shearCap = mat.shearOpen;
+        if (appState.triangulation && appState.crossBracing) {
+          shearCap = mat.shearBoth;
+        } else if (appState.crossBracing) {
+          shearCap = mat.shearCross;
+        } else if (appState.triangulation) {
+          shearCap = mat.shearTri;
+        }
+
+        var shearRatio = fAbs / shearCap;
+
+        var rad = (appState.anchorAngle * Math.PI) / 180;
+        var cosA = Math.cos(rad);
+        var sinA = Math.sin(rad);
+        var sin30 = 0.5;
+
+        var tensionMax = 140;
+        var guyTension = 0;
+        var tensionRatio = 0;
+        var overturnRatio = 0;
+        var foundationDown = mat.selfWeight + (effLoadL + effLoadR) * 0.35;
+
+        var anchorDir = appState.anchorSide === `right` ? 1 : (appState.anchorSide === `left` ? -1 : 0);
+        var anchorOpposes = anchorDir !== 0 && pullDir !== 0 && anchorDir === -pullDir;
+        var anchorSameSide = anchorDir !== 0 && pullDir !== 0 && anchorDir === pullDir;
+
+        if (anchorDir === 0) {
+          guyTension = 0;
+          tensionRatio = 0;
+          overturnRatio = fAbs / mat.unanchoredLatCap;
+          if (overturnRatio > 0.95) {
+            foundationDown = mat.selfWeight - fAbs * 1.4;
+          }
+        } else if (anchorSameSide) {
+          guyTension = fAbs * 0.65;
+          tensionRatio = guyTension / tensionMax;
+          overturnRatio = (fAbs + guyTension * cosA) / mat.unanchoredLatCap;
+        } else if (pullDir === 0) {
+          var slackPre = 12 * (1 / sinA - 1 / sin30);
+          guyTension = Math.max(8, slackPre);
+          tensionRatio = guyTension / tensionMax;
+          overturnRatio = 0.05;
+          foundationDown += guyTension * sinA;
+        } else if (anchorOpposes) {
+          var geomTension = fAbs / cosA;
+          var sagFactor = Math.max(0, 1 / sinA - 1 / sin30);
+          var shallowStress = 2.0 * sagFactor * (32 + 0.52 * fAbs);
+          guyTension = geomTension + shallowStress;
+          tensionRatio = guyTension / tensionMax;
+
+          var steepPenalty = appState.anchorAngle > 65
+            ? Math.pow((appState.anchorAngle - 65) / 8, 1.55) * (0.45 + 0.65 * (fAbs / 60))
+            : 0;
+          overturnRatio = 0.14 + (fAbs / 180) + steepPenalty;
+          if (appState.anchorAngle > 70 && fAbs >= 22) {
+            overturnRatio = Math.max(overturnRatio, 1.04 + (appState.anchorAngle - 70) * 0.06);
+          }
+          foundationDown += guyTension * sinA;
+        }
+
+        var failure = null;
+        if (tensionRatio > 1.0) {
+          failure = `cable-snap`;
+        } else if (overturnRatio > 1.0) {
+          failure = `topple`;
+        } else if (shearRatio > 1.0) {
+          failure = `buckle`;
+        }
+
+        return {
+          fLeft: fLeft,
+          fRight: fRight,
+          fNet: fNet,
+          fAbs: fAbs,
+          pullDir: pullDir,
+          anchorDir: anchorDir,
+          anchorOpposes: anchorOpposes,
+          anchorSameSide: anchorSameSide,
+          shearCap: shearCap,
+          shearRatio: shearRatio,
+          guyTension: guyTension,
+          tensionMax: tensionMax,
+          tensionRatio: tensionRatio,
+          overturnRatio: overturnRatio,
+          foundationDown: foundationDown,
+          failure: failure
+        };
+      }
+
+      function getPylonX() {
+        if (appState.anchorSide === `right`) return 290;
+        if (appState.anchorSide === `left`) return 670;
+        return 480;
+      }
+
+      function renderGridAndGround(pylonX) {
+        var gridLayer = byId(`svg-grid-layer`);
+        var groundLayer = byId(`svg-ground-layer`);
+        if (!gridLayer || !groundLayer) return;
+
+        gridLayer.innerHTML = ``;
+        groundLayer.innerHTML = ``;
+
+        for (var gx = 40; gx < 960; gx += 40) {
+          gridLayer.appendChild(svgEl(`line`, {
+            x1: gx, y1: 10, x2: gx, y2: GROUND_Y,
+            stroke: `var(--grid-stroke)`, 'stroke-width': 1
+          }));
+        }
+        for (var gy = 50; gy < GROUND_Y; gy += 40) {
+          gridLayer.appendChild(svgEl(`line`, {
+            x1: 10, y1: gy, x2: 950, y2: gy,
+            stroke: `var(--grid-stroke)`, 'stroke-width': 1
+          }));
+        }
+
+        // Optimal 30-50 degree ground target zone when anchored
+        if (appState.anchorSide !== `none`) {
+          var dir = appState.anchorSide === `right` ? 1 : -1;
+          var attachX = pylonX + dir * 18;
+          var dx30 = ATTACH_H / Math.tan((30 * Math.PI) / 180);
+          var dx50 = ATTACH_H / Math.tan((50 * Math.PI) / 180);
+          var xStart = Math.min(attachX + dir * dx30, attachX + dir * dx50);
+          var xEnd = Math.max(attachX + dir * dx30, attachX + dir * dx50);
+          groundLayer.appendChild(svgEl(`polygon`, {
+            points: attachX + `,` + ATTACH_Y + ` ` + xStart + `,` + GROUND_Y + ` ` + xEnd + `,` + GROUND_Y,
+            fill: `var(--optimal-zone-fill)`
+          }));
+          groundLayer.appendChild(svgEl(`text`, {
+            x: (xStart + xEnd) / 2,
+            y: GROUND_Y - 8,
+            'text-anchor': `middle`,
+            class: `svg-label-muted`
+          })).textContent = `OPTIMAL 30°–50°`;
+        }
+
+        // Ground earth strip
+        groundLayer.appendChild(svgEl(`rect`, {
+          x: 0, y: GROUND_Y, width: 960, height: 70,
+          fill: `var(--ground-fill)`
+        }));
+        groundLayer.appendChild(svgEl(`line`, {
+          x1: 0, y1: GROUND_Y, x2: 960, y2: GROUND_Y,
+          stroke: `var(--ground-stroke)`, 'stroke-width': 2
+        }));
+      }
+
+      function renderPylonAndCables(pylonX, phys) {
+        var pylonLayer = byId(`svg-pylon-layer`);
+        var cablesLayer = byId(`svg-cables-layer`);
+        var anchorLayer = byId(`svg-anchor-layer`);
+        var vectorLayer = byId(`svg-vectors-layer`);
+        var labelLayer = byId(`svg-labels-layer`);
+        if (!pylonLayer || !cablesLayer || !anchorLayer || !vectorLayer || !labelLayer) return;
+
+        pylonLayer.innerHTML = ``;
+        cablesLayer.innerHTML = ``;
+        anchorLayer.innerHTML = ``;
+        vectorLayer.innerHTML = ``;
+        labelLayer.innerHTML = ``;
+
+        var isSteel = appState.material === `steel`;
+        var frameCol = isSteel ? `var(--steel-frame)` : `var(--wood-frame)`;
+        var braceCol = isSteel ? `var(--steel-brace)` : `var(--wood-brace)`;
+        var legWidth = isSteel ? 4 : 6;
+
+        // Calculate visual deformation from physics / failure state
+        var activeFail = simState.failureType;
+        var shearDirection = phys.pullDir !== 0 ? phys.pullDir : -1;
+        var shearPx = 0;
+
+        if (!appState.triangulation && !appState.crossBracing) {
+          shearPx = clamp(phys.shearRatio * 14, 0, 22) * shearDirection;
+        } else {
+          shearPx = clamp(phys.shearRatio * 3, 0, 5) * shearDirection;
+        }
+
+        if (activeFail === `buckle`) {
+          shearPx = 46 * shearDirection;
+        }
+
+        var toppleDeg = 0;
+        if (activeFail === `topple`) {
+          toppleDeg = 24 * shearDirection;
+        } else if (activeFail === `cable-snap`) {
+          toppleDeg = 11 * shearDirection;
+        } else if (phys.anchorSameSide && phys.fAbs > 15) {
+          toppleDeg = 4 * shearDirection;
+        }
+
+        var pivotX = pylonX + shearDirection * 38;
+        var pivotY = GROUND_Y;
+
+        // Foundation Pads (D)
+        var leftPadLift = activeFail === `topple` && shearDirection < 0 ? 0 : (activeFail === `topple` ? -16 : 0);
+        var rightPadLift = activeFail === `topple` && shearDirection > 0 ? 0 : (activeFail === `topple` ? -16 : 0);
+
+        pylonLayer.appendChild(svgEl(`rect`, {
+          x: pylonX - 50, y: GROUND_Y - 4 + leftPadLift, width: 24, height: 18,
+          fill: `var(--foundation-fill)`, stroke: `var(--on-surface)`, 'stroke-width': 1.5
+        }));
+        pylonLayer.appendChild(svgEl(`rect`, {
+          x: pylonX + 26, y: GROUND_Y - 4 + rightPadLift, width: 24, height: 18,
+          fill: `var(--foundation-fill)`, stroke: `var(--on-surface)`, 'stroke-width': 1.5
+        }));
+
+        if (activeFail === `topple`) {
+          var upliftX = shearDirection < 0 ? pylonX + 38 : pylonX - 38;
+          pylonLayer.appendChild(svgEl(`text`, {
+            x: upliftX, y: GROUND_Y + 30,
+            'text-anchor': `middle`,
+            fill: `var(--error)`,
+            'font-family': `var(--font-label)`,
+            'font-size': `11`,
+            'font-weight': `700`
+          })).textContent = `UPLIFT FAILURE`;
+        }
+
+        // Rotating / shearing pylon group
+        var pylonGroup = svgEl(`g`, {
+          transform: `rotate(` + toppleDeg + ` ` + pivotX + ` ` + pivotY + `)`
+        });
+
+        var bays = [
+          { y0: GROUND_Y, y1: 305, hw0: 38, hw1: 29, s0: 0, s1: shearPx * 0.32 },
+          { y0: 305, y1: 240, hw0: 29, hw1: 21, s0: shearPx * 0.32, s1: shearPx * 0.68 },
+          { y0: 240, y1: CROSSARM_Y, hw0: 21, hw1: 14, s0: shearPx * 0.68, s1: shearPx }
+        ];
+
+        for (var b = 0; b < bays.length; b++) {
+          var bay = bays[b];
+          var lx0 = pylonX - bay.hw0 + bay.s0;
+          var rx0 = pylonX + bay.hw0 + bay.s0;
+          var lx1 = pylonX - bay.hw1 + bay.s1;
+          var rx1 = pylonX + bay.hw1 + bay.s1;
+
+          // Horizontal girth beam
+          pylonGroup.appendChild(svgEl(`line`, {
+            x1: lx1, y1: bay.y1, x2: rx1, y2: bay.y1,
+            stroke: frameCol, 'stroke-width': 3
+          }));
+
+          // Triangulation (C) single diagonal alternating per bay
+          if (appState.triangulation) {
+            var diagStart = b % 2 === 0 ? [lx0, bay.y0] : [rx0, bay.y0];
+            var diagEnd = b % 2 === 0 ? [rx1, bay.y1] : [lx1, bay.y1];
+            pylonGroup.appendChild(svgEl(`line`, {
+              x1: diagStart[0], y1: diagStart[1], x2: diagEnd[0], y2: diagEnd[1],
+              stroke: braceCol, 'stroke-width': 2.5
+            }));
+          }
+
+          // Cross-bracing (B) crossing X-members
+          if (appState.crossBracing) {
+            pylonGroup.appendChild(svgEl(`line`, {
+              x1: lx0, y1: bay.y0, x2: rx1, y2: bay.y1,
+              stroke: braceCol, 'stroke-width': 2, 'stroke-dasharray': appState.triangulation ? `none` : `none`
+            }));
+            pylonGroup.appendChild(svgEl(`line`, {
+              x1: rx0, y1: bay.y0, x2: lx1, y2: bay.y1,
+              stroke: braceCol, 'stroke-width': 2
+            }));
+          }
+
+          // Main legs
+          pylonGroup.appendChild(svgEl(`line`, {
+            x1: lx0, y1: bay.y0, x2: lx1, y2: bay.y1,
+            stroke: frameCol, 'stroke-width': legWidth, 'stroke-linecap': `square`
+          }));
+          pylonGroup.appendChild(svgEl(`line`, {
+            x1: rx0, y1: bay.y0, x2: rx1, y2: bay.y1,
+            stroke: frameCol, 'stroke-width': legWidth, 'stroke-linecap': `square`
+          }));
+        }
+
+        // Peak spire
+        var topCenter = pylonX + shearPx;
+        pylonGroup.appendChild(svgEl(`line`, {
+          x1: topCenter - 14, y1: CROSSARM_Y, x2: topCenter, y2: PEAK_Y,
+          stroke: frameCol, 'stroke-width': legWidth - 1
+        }));
+        pylonGroup.appendChild(svgEl(`line`, {
+          x1: topCenter + 14, y1: CROSSARM_Y, x2: topCenter, y2: PEAK_Y,
+          stroke: frameCol, 'stroke-width': legWidth - 1
+        }));
+
+        // Cross-arm at CROSSARM_Y
+        var armLeftX = topCenter - 68;
+        var armRightX = topCenter + 68;
+        pylonGroup.appendChild(svgEl(`line`, {
+          x1: armLeftX, y1: CROSSARM_Y, x2: armRightX, y2: CROSSARM_Y,
+          stroke: frameCol, 'stroke-width': 4
+        }));
+        // Insulators
+        pylonGroup.appendChild(svgEl(`line`, {
+          x1: armLeftX + 6, y1: CROSSARM_Y, x2: armLeftX + 6, y2: CROSSARM_Y + 14,
+          stroke: `var(--primary)`, 'stroke-width': 3
+        }));
+        pylonGroup.appendChild(svgEl(`line`, {
+          x1: armRightX - 6, y1: CROSSARM_Y, x2: armRightX - 6, y2: CROSSARM_Y + 14,
+          stroke: `var(--primary)`, 'stroke-width': 3
+        }));
+
+        pylonLayer.appendChild(pylonGroup);
+
+        // Compute rotated cross-arm & guy-wire attachment coordinates
+        function rotatePoint(px, py) {
+          var rad = (toppleDeg * Math.PI) / 180;
+          var dx = px - pivotX;
+          var dy = py - pivotY;
+          return {
+            x: pivotX + dx * Math.cos(rad) - dy * Math.sin(rad),
+            y: pivotY + dx * Math.sin(rad) + dy * Math.cos(rad)
+          };
+        }
+
+        var leftIns = rotatePoint(armLeftX + 6, CROSSARM_Y + 14);
+        var rightIns = rotatePoint(armRightX - 6, CROSSARM_Y + 14);
+
+        // Electrical Cables (A) - Left Span
+        var sway = simState.running ? Math.sin(simState.oscPhase) * 3 : 0;
+        if (appState.loadLeft > 0) {
+          var sagL = 18 + (appState.loadLeft / 100) * 44 + sway;
+          var thickL = 1.5 + (appState.loadLeft / 100) * 2.5;
+          for (var cL = 0; cL < 2; cL++) {
+            var yOff = cL * 7;
+            cablesLayer.appendChild(svgEl(`path`, {
+              d: `M 0 ` + (leftIns.y + 18 + yOff) + ` Q ` + (leftIns.x * 0.5) + ` ` + (leftIns.y + sagL + yOff) + ` ` + leftIns.x + ` ` + (leftIns.y + yOff * 0.3),
+              fill: `none`,
+              stroke: `var(--cable-stroke)`,
+              'stroke-width': thickL
+            }));
+          }
+        }
+
+        // Electrical Cables (A) - Right Span (Dual-Span Mode)
+        if (appState.spanMode === `dual` && appState.loadRight > 0) {
+          var sagR = 18 + (appState.loadRight / 100) * 44 - sway;
+          var thickR = 1.5 + (appState.loadRight / 100) * 2.5;
+          for (var cR = 0; cR < 2; cR++) {
+            var yOffR = cR * 7;
+            cablesLayer.appendChild(svgEl(`path`, {
+              d: `M ` + rightIns.x + ` ` + (rightIns.y + yOffR * 0.3) + ` Q ` + ((rightIns.x + 960) * 0.5) + ` ` + (rightIns.y + sagR + yOffR) + ` 960 ` + (rightIns.y + 18 + yOffR),
+              fill: `none`,
+              stroke: `var(--cable-stroke)`,
+              'stroke-width': thickR
+            }));
+          }
+        }
+
+        // Guy-wire Anchor & Cable
+        var anchorX = null;
+        var attachPt = null;
+        if (appState.anchorSide !== `none`) {
+          var dir = appState.anchorSide === `right` ? 1 : -1;
+          var baseAttachX = pylonX + dir * 18 + shearPx * 0.78;
+          attachPt = rotatePoint(baseAttachX, ATTACH_Y);
+
+          var angleRad = (appState.anchorAngle * Math.PI) / 180;
+          var dxAnchor = ATTACH_H / Math.tan(angleRad);
+          anchorX = clamp(pylonX + dir * (18 + dxAnchor), 36, 924);
+
+          if (activeFail === `cable-snap`) {
+            var midX = (attachPt.x + anchorX) * 0.5;
+            var midY = (attachPt.y + GROUND_Y) * 0.5;
+            anchorLayer.appendChild(svgEl(`path`, {
+              d: `M ` + attachPt.x + ` ` + attachPt.y + ` Q ` + (attachPt.x + dir * 20) + ` ` + (midY + 25) + ` ` + (midX - dir * 18) + ` ` + (midY + 42),
+              fill: `none`, stroke: `var(--error)`, 'stroke-width': 2.5, 'stroke-dasharray': `5 3`
+            }));
+            anchorLayer.appendChild(svgEl(`path`, {
+              d: `M ` + anchorX + ` ` + GROUND_Y + ` Q ` + (anchorX - dir * 20) + ` ` + (GROUND_Y - 12) + ` ` + (midX + dir * 24) + ` ` + (GROUND_Y - 8),
+              fill: `none`, stroke: `var(--error)`, 'stroke-width': 2.5
+            }));
+            anchorLayer.appendChild(svgEl(`circle`, {
+              cx: midX, cy: midY + 12, r: 7, fill: `var(--error)`
+            }));
+            anchorLayer.appendChild(svgEl(`text`, {
+              x: midX, y: midY - 4, 'text-anchor': `middle`,
+              fill: `var(--error)`, 'font-family': `var(--font-label)`, 'font-size': `11`, 'font-weight': `700`
+            })).textContent = `CABLE SNAPPED`;
+          } else {
+            var wireCol = phys.tensionRatio > 0.9 ? `var(--error)` : `var(--on-surface)`;
+            anchorLayer.appendChild(svgEl(`line`, {
+              x1: attachPt.x, y1: attachPt.y, x2: anchorX, y2: GROUND_Y,
+              stroke: wireCol, 'stroke-width': 2.5
+            }));
+          }
+
+          // Protractor arc at ground anchor
+          var arcRadius = 42;
+          var arcStartX = anchorX - dir * arcRadius;
+          var arcStartY = GROUND_Y;
+          var arcEndX = anchorX - dir * arcRadius * Math.cos(angleRad);
+          var arcEndY = GROUND_Y - arcRadius * Math.sin(angleRad);
+          var sweepFlag = dir > 0 ? 1 : 0;
+          anchorLayer.appendChild(svgEl(`path`, {
+            d: `M ` + arcStartX + ` ` + arcStartY + ` A ` + arcRadius + ` ` + arcRadius + ` 0 0 ` + sweepFlag + ` ` + arcEndX + ` ` + arcEndY,
+            fill: `none`, stroke: `var(--primary)`, 'stroke-width': 1.5
+          }));
+          anchorLayer.appendChild(svgEl(`text`, {
+            x: anchorX - dir * 56, y: GROUND_Y - 14,
+            'text-anchor': `middle`,
+            fill: `var(--primary)`,
+            'font-family': `var(--font-label)`,
+            'font-size': `12`,
+            'font-weight': `600`
+          })).textContent = appState.anchorAngle + `°`;
+
+          // Interactive Anchor Grip (D)
+          var handleGroup = svgEl(`g`, {
+            class: `anchor-handle`,
+            id: `svg-anchor-handle`,
+            tabindex: `0`,
+            role: `slider`,
+            'aria-label': `Drag ground anchor to change guy-wire angle`,
+            'aria-valuemin': `15`,
+            'aria-valuemax': `75`,
+            'aria-valuenow': String(appState.anchorAngle)
+          });
+          handleGroup.appendChild(svgEl(`rect`, {
+            x: anchorX - 18, y: GROUND_Y - 7, width: 36, height: 22,
+            fill: `var(--foundation-fill)`, stroke: `var(--on-surface)`, 'stroke-width': 2
+          }));
+          handleGroup.appendChild(svgEl(`circle`, {
+            cx: anchorX, cy: GROUND_Y - 7, r: 9,
+            class: `anchor-grip`,
+            fill: `var(--background)`, stroke: `var(--primary)`, 'stroke-width': 2.5
+          }));
+          handleGroup.appendChild(svgEl(`text`, {
+            x: anchorX, y: GROUND_Y + 32,
+            'text-anchor': `middle`,
+            class: `svg-label-mono`
+          })).textContent = `◄ DRAG ANCHOR ►`;
+          anchorLayer.appendChild(handleGroup);
+        }
+
+        // Force Vector Visualiser
+        if (appState.showVectors) {
+          // Net Lateral Pull Vector
+          if (phys.fAbs > 1) {
+            var latLen = clamp(phys.fAbs * 1.15, 28, 120);
+            var vecStartX = phys.pullDir < 0 ? leftIns.x : rightIns.x;
+            var vecStartY = CROSSARM_Y - 12;
+            var vecEndX = vecStartX + phys.pullDir * latLen;
+            vectorLayer.appendChild(svgEl(`line`, {
+              x1: vecStartX, y1: vecStartY, x2: vecEndX, y2: vecStartY,
+              stroke: `var(--vector-lateral)`, 'stroke-width': 3,
+              'marker-end': `url(#arrow-lateral)`
+            }));
+            vectorLayer.appendChild(svgEl(`text`, {
+              x: (vecStartX + vecEndX) * 0.5, y: vecStartY - 8,
+              'text-anchor': `middle`,
+              fill: `var(--vector-lateral)`,
+              'font-family': `var(--font-label)`, 'font-size': `11`, 'font-weight': `600`
+            })).textContent = `F_lat ` + phys.fAbs.toFixed(1) + ` kN`;
+          }
+
+          // Guy-Wire Tension Vector
+          if (attachPt && anchorX !== null && activeFail !== `cable-snap` && phys.guyTension > 1) {
+            var dxW = anchorX - attachPt.x;
+            var dyW = GROUND_Y - attachPt.y;
+            var lenW = Math.hypot(dxW, dyW) || 1;
+            var vecT = clamp(phys.guyTension * 0.85, 36, 130);
+            var tEndX = attachPt.x + (dxW / lenW) * vecT;
+            var tEndY = attachPt.y + (dyW / lenW) * vecT;
+            var tCol = phys.tensionRatio > 1 ? `var(--vector-danger)` : `var(--vector-tension)`;
+            var tMark = phys.tensionRatio > 1 ? `url(#arrow-danger)` : `url(#arrow-tension)`;
+            vectorLayer.appendChild(svgEl(`line`, {
+              x1: attachPt.x, y1: attachPt.y, x2: tEndX, y2: tEndY,
+              stroke: tCol, 'stroke-width': 3, 'marker-end': tMark
+            }));
+            vectorLayer.appendChild(svgEl(`text`, {
+              x: tEndX + (appState.anchorSide === `right` ? 10 : -10),
+              y: tEndY - 6,
+              'text-anchor': appState.anchorSide === `right` ? `start` : `end`,
+              fill: tCol,
+              'font-family': `var(--font-label)`, 'font-size': `11`, 'font-weight': `600`
+            })).textContent = `T ` + phys.guyTension.toFixed(1) + ` kN`;
+          }
+
+          // Foundation Compression / Uplift Vector
+          var fVecLen = clamp(Math.abs(phys.foundationDown) * 0.4, 24, 60);
+          var isUplift = phys.foundationDown < 0 || activeFail === `topple`;
+          var fCol = isUplift ? `var(--vector-danger)` : `var(--vector-foundation)`;
+          var fMark = isUplift ? `url(#arrow-danger)` : `url(#arrow-foundation)`;
+          var fStartY = GROUND_Y + 14;
+          var fEndY = isUplift ? GROUND_Y - 30 : fStartY + fVecLen;
+          vectorLayer.appendChild(svgEl(`line`, {
+            x1: pylonX, y1: fStartY, x2: pylonX, y2: fEndY,
+            stroke: fCol, 'stroke-width': 3, 'marker-end': fMark
+          }));
+          vectorLayer.appendChild(svgEl(`text`, {
+            x: pylonX, y: isUplift ? GROUND_Y - 36 : fEndY + 14,
+            'text-anchor': `middle`,
+            fill: fCol,
+            'font-family': `var(--font-label)`, 'font-size': `11`, 'font-weight': `600`
+          })).textContent = isUplift ? `UPLIFT!` : `F_D ` + phys.foundationDown.toFixed(0) + ` kN`;
+        }
+
+        // Member Callout Badges A-D
+        if (appState.showLabels) {
+          var badges = [
+            { id: `A`, text: `A · Cables`, x: appState.loadLeft > 0 ? Math.max(70, leftIns.x - 95) : rightIns.x + 80, y: CROSSARM_Y + 38 },
+            { id: `B`, text: `B · Cross-bracing`, x: pylonX + (appState.anchorSide === `right` ? -90 : 90), y: 272 },
+            { id: `C`, text: `C · Triangulation`, x: pylonX + (appState.anchorSide === `right` ? -92 : 92), y: 336 },
+            { id: `D`, text: `D · Foundation`, x: pylonX - 96, y: GROUND_Y - 12 }
+          ];
+          for (var k = 0; k < badges.length; k++) {
+            var bd = badges[k];
+            var g = svgEl(`g`, {});
+            g.appendChild(svgEl(`rect`, {
+              x: bd.x - 52, y: bd.y - 12, width: 104, height: 20,
+              fill: `var(--background)`, stroke: `var(--outline)`, 'stroke-width': 1
+            }));
+            g.appendChild(svgEl(`text`, {
+              x: bd.x, y: bd.y + 2,
+              'text-anchor': `middle`,
+              class: `svg-label-mono`
+            })).textContent = bd.text;
+            labelLayer.appendChild(g);
+          }
+        }
+      }
+
+      function updateUI() {
+        var mult = simState.running ? simState.loadMultiplier : 1;
+        var phys = computePhysics(mult);
+        var pylonX = getPylonX();
+
+        renderGridAndGround(pylonX);
+        renderPylonAndCables(pylonX, phys);
+
+        // Update Telemetry Tiles
+        var elAngle = byId(`val-angle`);
+        var subAngle = byId(`sub-angle`);
+        var tileAngle = byId(`tile-angle`);
+        if (elAngle && subAngle && tileAngle) {
+          if (appState.anchorSide === `none`) {
+            elAngle.textContent = `None`;
+            subAngle.textContent = `Unanchored`;
+            subAngle.className = `key-sub is-danger`;
+          } else {
+            elAngle.textContent = appState.anchorAngle + `°`;
+            if (appState.anchorAngle < 20) {
+              subAngle.textContent = `Shallow (<20°) · Snap Risk`;
+              subAngle.className = `key-sub is-danger`;
+            } else if (appState.anchorAngle > 70) {
+              subAngle.textContent = `Steep (>70°) · Topple Risk`;
+              subAngle.className = `key-sub is-danger`;
+            } else if (appState.anchorAngle >= 30 && appState.anchorAngle <= 50) {
+              subAngle.textContent = `Optimal 30°–50° Zone`;
+              subAngle.className = `key-sub is-ok`;
+            } else {
+              subAngle.textContent = `Moderate Angle`;
+              subAngle.className = `key-sub is-warn`;
+            }
+          }
+        }
+
+        var elTension = byId(`val-tension`);
+        var subTension = byId(`sub-tension`);
+        var tileTension = byId(`tile-tension`);
+        if (elTension && subTension && tileTension) {
+          elTension.textContent = phys.guyTension.toFixed(1) + ` kN`;
+          var tPct = Math.round(phys.tensionRatio * 100);
+          subTension.textContent = tPct + `% of 140 kN limit`;
+          subTension.className = `key-sub ` + (tPct > 100 ? `is-danger` : (tPct > 80 ? `is-warn` : `is-ok`));
+          tileTension.className = `key-tile ` + (tPct > 100 ? `is-danger` : (tPct > 80 ? `is-warn` : `is-ok`));
+        }
+
+        var elShear = byId(`val-shear`);
+        var subShear = byId(`sub-shear`);
+        var tileShear = byId(`tile-shear`);
+        if (elShear && subShear && tileShear) {
+          elShear.textContent = phys.fAbs.toFixed(1) + ` kN`;
+          var sPct = Math.round(phys.shearRatio * 100);
+          subShear.textContent = sPct + `% of ` + phys.shearCap + ` kN cap`;
+          subShear.className = `key-sub ` + (sPct > 100 ? `is-danger` : (sPct > 80 ? `is-warn` : `is-ok`));
+          tileShear.className = `key-tile ` + (sPct > 100 ? `is-danger` : (sPct > 80 ? `is-warn` : `is-ok`));
+        }
+
+        var elFound = byId(`val-foundation`);
+        var subFound = byId(`sub-foundation`);
+        var tileFound = byId(`tile-foundation`);
+        if (elFound && subFound && tileFound) {
+          var oPct = Math.round(phys.overturnRatio * 100);
+          elFound.textContent = phys.foundationDown.toFixed(1) + ` kN`;
+          if (simState.failureType === `topple` || phys.overturnRatio > 1) {
+            subFound.textContent = `Uplift / Overturn (` + oPct + `%)`;
+            subFound.className = `key-sub is-danger`;
+            tileFound.className = `key-tile is-danger`;
+          } else {
+            subFound.textContent = `Downward Compression`;
+            subFound.className = `key-sub is-ok`;
+            tileFound.className = `key-tile is-ok`;
+          }
+        }
+
+        // Margin Bars
+        updateMarginBar(`tension`, phys.tensionRatio);
+        updateMarginBar(`shear`, phys.shearRatio);
+        updateMarginBar(`overturn`, phys.overturnRatio);
+
+        // Diagnostic Box
+        updateDiagnosticBox(phys);
+
+        // Controls sync
+        syncControlsUI();
+        updateChallengeBanner();
+      }
+
+      function updateMarginBar(key, ratio) {
+        var bar = byId(`bar-` + key);
+        var pctEl = byId(`pct-` + key);
+        if (!bar || !pctEl) return;
+        var pct = Math.round(ratio * 100);
+        bar.style.width = clamp(pct, 0, 100) + `%`;
+        bar.className = `margin-fill ` + (pct > 100 ? `is-danger` : (pct > 80 ? `is-warn` : `is-ok`));
+        pctEl.textContent = pct + `%`;
+      }
+
+      function updateDiagnosticBox(phys) {
+        var box = byId(`diagnostic-box`);
+        var badge = byId(`diag-badge`);
+        var modeTag = byId(`diag-mode-tag`);
+        var msg = byId(`diag-message`);
+        var tip = byId(`diag-tip`);
+        if (!box || !badge || !modeTag || !msg || !tip) return;
+
+        modeTag.textContent = appState.spanMode === `terminal`
+          ? `Terminal Pylon · ` + MATERIALS[appState.material].name + ` Frame`
+          : `Dual-Span Asymmetrical · ` + MATERIALS[appState.material].name + ` Frame`;
+
+        var fail = simState.failureType || phys.failure;
+
+        if (fail === `cable-snap`) {
+          box.className = `diagnostic-box state-fail`;
+          badge.textContent = `STRUCTURAL FAILURE · CABLE SNAPPED`;
+          msg.textContent = appState.anchorAngle < 20
+            ? `At a shallow anchor angle (` + appState.anchorAngle + `° < 20°), the long guy-wire span requires extreme tension (` + phys.guyTension.toFixed(1) + ` kN) to remain taut and resist the lateral pull of cables (A), exceeding the 140 kN breaking limit.`
+            : `Guy-wire tension (` + phys.guyTension.toFixed(1) + ` kN) exceeded the 140 kN breaking limit under heavy cable load.`;
+          tip.textContent = `Engineering fix: Move the ground anchor closer to set an optimal angle between 30° and 50°, or reduce lateral imbalance.`;
+        } else if (fail === `topple`) {
+          box.className = `diagnostic-box state-fail`;
+          badge.textContent = `STRUCTURAL FAILURE · TOPPLING & FOUNDATION UPLIFT`;
+          if (appState.anchorSide === `none`) {
+            msg.textContent = `Without an opposing anchor guy-wire, the lateral pull (` + phys.fAbs.toFixed(1) + ` kN) creates a strong overturning moment that lifts the windward foundation (D) off the ground and topples the pylon.`;
+            tip.textContent = `Engineering fix: Attach a guy-wire anchor on the side opposite to the net cable pull at 30°–50°.`;
+          } else if (phys.anchorSameSide) {
+            msg.textContent = `The guy-wire is anchored on the SAME side as the net cable pull, adding to the overturning force instead of opposing it!`;
+            tip.textContent = `Engineering fix: Switch the anchor to the side opposite the heavier cable span.`;
+          } else {
+            msg.textContent = `At a steep anchor angle (` + appState.anchorAngle + `° > 70°), the guy-wire sits too close to the pylon base, giving poor horizontal leverage to balance cable pull (A) and causing foundation uplift and toppling.`;
+            tip.textContent = `Engineering fix: Move the ground anchor further out to bring the angle down into the 30°–50° optimal zone.`;
+          }
+        } else if (fail === `buckle`) {
+          box.className = `diagnostic-box state-fail`;
+          badge.textContent = `STRUCTURAL FAILURE · FRAME BUCKLING & SHEARING`;
+          if (!appState.triangulation && !appState.crossBracing) {
+            msg.textContent = `Open quadrilateral frame bays cannot resist lateral shear (` + phys.fAbs.toFixed(1) + ` kN > ` + phys.shearCap + ` kN capacity), so the rectangles deform into parallelograms and buckle sideways.`;
+            tip.textContent = `Engineering fix: Enable Triangulation (C) to lock rectangles into rigid triangles, and Cross-Bracing (B) to boost load capacity.`;
+          } else if (appState.material === `wood` && phys.fAbs > MATERIALS.wood.shearBoth) {
+            msg.textContent = `Although braced, a Wood frame's maximum shear capacity (68 kN) is exceeded by this heavy high-voltage load (` + phys.fAbs.toFixed(1) + ` kN).`;
+            tip.textContent = `Engineering fix: Switch to a Steel frame (108 kN capacity) with both Triangulation (C) and Cross-Bracing (B) active.`;
+          } else {
+            msg.textContent = `Lateral shear (` + phys.fAbs.toFixed(1) + ` kN) exceeds the current frame capacity (` + phys.shearCap + ` kN).`;
+            tip.textContent = `Engineering fix: Combine both Triangulation (C) and Cross-Bracing (B) on a Steel frame to maximise frame rigidity.`;
+          }
+        } else if (phys.tensionRatio > 0.8 || phys.shearRatio > 0.8 || phys.overturnRatio > 0.8) {
+          box.className = `diagnostic-box state-warn`;
+          badge.textContent = `HIGH STRESS WARNING · NEAR LIMIT`;
+          msg.textContent = `The pylon is currently standing, but structural stress exceeds 80% of safe limits (` + (appState.anchorAngle < 30 || appState.anchorAngle > 50 ? `anchor angle ` + appState.anchorAngle + `° is outside 30°–50°` : `heavy lateral cable load`) + `).`;
+          tip.textContent = `Engineering tip: Aim for 30°–50° anchor angle, full triangulation (C) + cross-bracing (B), and run the Stress Test to verify.`;
+        } else {
+          box.className = `diagnostic-box state-ok`;
+          badge.textContent = simState.testPassed ? `STRESS TEST PASSED · BALANCED & RIGID` : `BALANCED & RIGID · READY TO TEST`;
+          msg.textContent = `Net lateral cable pull (` + phys.fAbs.toFixed(1) + ` kN) is safely balanced` + (appState.anchorSide !== `none` ? ` by the ` + appState.anchorAngle + `° guy-wire anchor` : ``) + `, transferring loads cleanly into foundations (D).`;
+          tip.textContent = `Key concept: ` + (appState.triangulation && appState.crossBracing ? `Triangulation (C) keeps the frame rigid while Cross-Bracing (B) increases total load capacity.` : `Click Run Stress Test to verify stability under dynamic gravity and wind load.`);
+        }
+      }
+
+      function syncControlsUI() {
+        var matSteel = byId(`mat-steel`);
+        var matWood = byId(`mat-wood`);
+        if (matSteel && matWood) {
+          matSteel.setAttribute(`aria-pressed`, appState.material === `steel` ? `true` : `false`);
+          matWood.setAttribute(`aria-pressed`, appState.material === `wood` ? `true` : `false`);
+        }
+
+        var chkTri = byId(`chk-triangulation`);
+        var chkCross = byId(`chk-crossbrace`);
+        if (chkTri) chkTri.checked = appState.triangulation;
+        if (chkCross) chkCross.checked = appState.crossBracing;
+
+        var aR = byId(`anchor-right`);
+        var aL = byId(`anchor-left`);
+        var aN = byId(`anchor-none`);
+        if (aR && aL && aN) {
+          aR.setAttribute(`aria-pressed`, appState.anchorSide === `right` ? `true` : `false`);
+          aL.setAttribute(`aria-pressed`, appState.anchorSide === `left` ? `true` : `false`);
+          aN.setAttribute(`aria-pressed`, appState.anchorSide === `none` ? `true` : `false`);
+        }
+
+        var sAngle = byId(`slider-angle`);
+        var nAngle = byId(`input-angle`);
+        var anchorDisabled = appState.anchorSide === `none`;
+        if (sAngle) {
+          sAngle.value = appState.anchorAngle;
+          sAngle.disabled = anchorDisabled;
+        }
+        if (nAngle) {
+          nAngle.value = appState.anchorAngle;
+          nAngle.disabled = anchorDisabled;
+        }
+
+        var spanT = byId(`span-terminal`);
+        var spanD = byId(`span-dual`);
+        if (spanT && spanD) {
+          spanT.setAttribute(`aria-pressed`, appState.spanMode === `terminal` ? `true` : `false`);
+          spanD.setAttribute(`aria-pressed`, appState.spanMode === `dual` ? `true` : `false`);
+        }
+
+        var sLoadL = byId(`slider-load-left`);
+        var nLoadL = byId(`input-load-left`);
+        if (sLoadL) sLoadL.value = appState.loadLeft;
+        if (nLoadL) nLoadL.value = appState.loadLeft;
+
+        var sLoadR = byId(`slider-load-right`);
+        var nLoadR = byId(`input-load-right`);
+        var rightDisabled = appState.spanMode !== `dual`;
+        if (sLoadR) {
+          sLoadR.value = rightDisabled ? 0 : appState.loadRight;
+          sLoadR.disabled = rightDisabled;
+        }
+        if (nLoadR) {
+          nLoadR.value = rightDisabled ? 0 : appState.loadRight;
+          nLoadR.disabled = rightDisabled;
+        }
+
+        var btnVec = byId(`btn-toggle-vectors`);
+        var btnLab = byId(`btn-toggle-labels`);
+        if (btnVec) {
+          btnVec.setAttribute(`aria-pressed`, appState.showVectors ? `true` : `false`);
+          btnVec.textContent = appState.showVectors ? `Force Vectors: On` : `Force Vectors: Off`;
+        }
+        if (btnLab) {
+          btnLab.setAttribute(`aria-pressed`, appState.showLabels ? `true` : `false`);
+          btnLab.textContent = appState.showLabels ? `Members A–D: On` : `Members A–D: Off`;
+        }
+
+        // Update challenge progress indicators
+        var passedCount = 0;
+        var ids = [`c1`, `c2`, `c3`];
+        for (var i = 0; i < ids.length; i++) {
+          var cid = ids[i];
+          var dot = byId(`dot-` + cid);
+          var isPassed = !!appState.passedChallenges[cid];
+          if (isPassed) passedCount++;
+          if (dot) {
+            dot.className = `tab-status-dot` + (isPassed ? ` is-passed` : ``);
+          }
+        }
+        var counter = byId(`challenge-counter`);
+        if (counter) {
+          counter.textContent = passedCount + ` / 3 Challenges Passed`;
+        }
+      }
+
+      function evaluateChallengeCriteria(mode) {
+        if (mode === `c1`) {
+          return [
+            { label: `Opposing Anchor Attached`, met: appState.anchorSide === `right` },
+            { label: `Optimal Angle (30°–50°)`, met: appState.anchorAngle >= 30 && appState.anchorAngle <= 50 },
+            { label: `75%+ Cable Load Tested`, met: appState.loadLeft >= 75 && simState.testPassed }
+          ];
+        }
+        if (mode === `c2`) {
+          return [
+            { label: `Steel Frame Selected`, met: appState.material === `steel` },
+            { label: `Triangulation (C) On`, met: appState.triangulation },
+            { label: `Cross-Bracing (B) On`, met: appState.crossBracing },
+            { label: `90%+ Load Stress Test Passed`, met: appState.loadLeft >= 90 && simState.testPassed }
+          ];
+        }
+        if (mode === `c3`) {
+          return [
+            { label: `Dual-Span Mode (85% vs 25%)`, met: appState.spanMode === `dual` && appState.loadLeft >= 85 && appState.loadRight <= 30 },
+            { label: `Right Opposing Anchor`, met: appState.anchorSide === `right` },
+            { label: `Effective Angle (25°–55°)`, met: appState.anchorAngle >= 25 && appState.anchorAngle <= 55 },
+            { label: `Stress Test Passed`, met: simState.testPassed }
+          ];
+        }
+        return [];
+      }
+
+      function updateChallengeBanner() {
+        var brief = byId(`challenge-brief`);
+        var kicker = byId(`challenge-kicker`);
+        var desc = byId(`challenge-desc`);
+        var critBox = byId(`challenge-criteria`);
+        if (!brief || !kicker || !desc || !critBox) return;
+
+        var tabs = [`sandbox`, `c1`, `c2`, `c3`];
+        for (var i = 0; i < tabs.length; i++) {
+          var t = byId(`tab-` + tabs[i]);
+          if (t) {
+            var active = appState.mode === tabs[i];
+            t.className = `tab-btn` + (active ? ` is-active` : ``);
+            t.setAttribute(`aria-selected`, active ? `true` : `false`);
+          }
+        }
+
+        if (appState.mode === `sandbox`) {
+          brief.hidden = true;
+          return;
+        }
+
+        var ch = CHALLENGES[appState.mode];
+        if (!ch) {
+          brief.hidden = true;
+          return;
+        }
+
+        brief.hidden = false;
+        var isPassed = !!appState.passedChallenges[appState.mode];
+        brief.className = `challenge-brief` + (isPassed ? ` is-passed` : ``);
+        kicker.textContent = isPassed ? ch.title + ` · COMPLETED` : ch.title;
+        desc.textContent = ch.desc;
+
+        var criteria = evaluateChallengeCriteria(appState.mode);
+        critBox.innerHTML = ``;
+        for (var j = 0; j < criteria.length; j++) {
+          var c = criteria[j];
+          var chip = document.createElement(`span`);
+          chip.className = `criterion-chip` + (c.met ? ` is-met` : ``);
+          chip.textContent = (c.met ? `✓ ` : `○ `) + c.label;
+          critBox.appendChild(chip);
+        }
+      }
+
+      function clearStressTest() {
+        if (simState.animId !== null) {
+          cancelAnimationFrame(simState.animId);
+          simState.animId = null;
+        }
+        simState.running = false;
+        simState.progress = 0;
+        simState.loadMultiplier = 1;
+        simState.failureType = null;
+        simState.testPassed = false;
+
+        var fill = byId(`stress-bar-fill`);
+        var sLabel = byId(`stress-status-label`);
+        var pctLabel = byId(`stress-pct-label`);
+        if (fill) {
+          fill.style.width = `0%`;
+          fill.className = `stress-bar-fill`;
+        }
+        if (sLabel) sLabel.textContent = `Live Equilibrium Preview — Click Run Stress Test to simulate dynamic load`;
+        if (pctLabel) pctLabel.textContent = `0%`;
+      }
+
+      // Hoisted interaction handlers
+      function toggleReferenceDrawer() {
+        var drawer = byId(`reference-drawer`);
+        var btn = byId(`btn-ref-toggle`);
+        if (!drawer || !btn) return;
+        var willOpen = drawer.hidden;
+        drawer.hidden = !willOpen;
+        btn.setAttribute(`aria-expanded`, willOpen ? `true` : `false`);
+      }
+
+      function selectMode(mode) {
+        clearStressTest();
+        appState.mode = mode;
+        if (CHALLENGES[mode]) {
+          var p = CHALLENGES[mode].preset;
+          appState.material = p.material;
+          appState.triangulation = p.triangulation;
+          appState.crossBracing = p.crossBracing;
+          appState.anchorSide = p.anchorSide;
+          appState.anchorAngle = p.anchorAngle;
+          appState.spanMode = p.spanMode;
+          appState.loadLeft = p.loadLeft;
+          appState.loadRight = p.loadRight;
+        }
+        updateUI();
+        persistState();
+      }
+
+      function reloadCurrentChallenge() {
+        if (CHALLENGES[appState.mode]) {
+          selectMode(appState.mode);
+        }
+      }
+
+      function setMaterial(mat) {
+        clearStressTest();
+        appState.material = mat;
+        updateUI();
+        persistState();
+      }
+
+      function toggleTriangulation(checked) {
+        clearStressTest();
+        appState.triangulation = !!checked;
+        updateUI();
+        persistState();
+      }
+
+      function toggleCrossBracing(checked) {
+        clearStressTest();
+        appState.crossBracing = !!checked;
+        updateUI();
+        persistState();
+      }
+
+      function setAnchorSide(side) {
+        clearStressTest();
+        appState.anchorSide = side;
+        updateUI();
+        persistState();
+      }
+
+      function setSpanMode(span) {
+        clearStressTest();
+        appState.spanMode = span;
+        if (span === `dual` && appState.loadRight === 0) {
+          appState.loadRight = 25;
+        }
+        updateUI();
+        persistState();
+      }
+
+      function syncAngleFromSlider(val) {
+        clearStressTest();
+        var num = clamp(parseInt(val, 10) || 40, 15, 75);
+        appState.anchorAngle = num;
+        var numInput = byId(`input-angle`);
+        if (numInput) numInput.value = num;
+        updateUI();
+        persistState();
+      }
+
+      function syncAngleFromNumber(val) {
+        clearStressTest();
+        var num = clamp(parseInt(val, 10) || 40, 15, 75);
+        appState.anchorAngle = num;
+        var slider = byId(`slider-angle`);
+        if (slider) slider.value = num;
+        updateUI();
+        persistState();
+      }
+
+      function syncLoadLFromSlider(val) {
+        clearStressTest();
+        var num = clamp(parseInt(val, 10) || 0, 0, 100);
+        appState.loadLeft = num;
+        var numInput = byId(`input-load-left`);
+        if (numInput) numInput.value = num;
+        updateUI();
+        persistState();
+      }
+
+      function syncLoadLFromNumber(val) {
+        clearStressTest();
+        var num = clamp(parseInt(val, 10) || 0, 0, 100);
+        appState.loadLeft = num;
+        var slider = byId(`slider-load-left`);
+        if (slider) slider.value = num;
+        updateUI();
+        persistState();
+      }
+
+      function syncLoadRFromSlider(val) {
+        clearStressTest();
+        var num = clamp(parseInt(val, 10) || 0, 0, 100);
+        appState.loadRight = num;
+        var numInput = byId(`input-load-right`);
+        if (numInput) numInput.value = num;
+        updateUI();
+        persistState();
+      }
+
+      function syncLoadRFromNumber(val) {
+        clearStressTest();
+        var num = clamp(parseInt(val, 10) || 0, 0, 100);
+        appState.loadRight = num;
+        var slider = byId(`slider-load-right`);
+        if (slider) slider.value = num;
+        updateUI();
+        persistState();
+      }
+
+      function toggleVectors() {
+        appState.showVectors = !appState.showVectors;
+        updateUI();
+        persistState();
+      }
+
+      function toggleMemberLabels() {
+        appState.showLabels = !appState.showLabels;
+        updateUI();
+        persistState();
+      }
+
+      function resetPylonState() {
+        clearStressTest();
+        updateUI();
+      }
+
+      function resetAllProgress(btn) {
+        if (!btn) return;
+        if (btn.dataset.armed !== `true`) {
+          btn.dataset.armed = `true`;
+          btn.textContent = `Confirm Reset?`;
+          setTimeout(function () {
+            if (btn.dataset.armed === `true`) {
+              btn.dataset.armed = `false`;
+              btn.textContent = `Reset Progress`;
+            }
+          }, 3000);
+          return;
+        }
+        btn.dataset.armed = `false`;
+        btn.textContent = `Reset Progress`;
+        appState.passedChallenges = { c1: false, c2: false, c3: false };
+        selectMode(`sandbox`);
+      }
+
+      function runStressTest() {
+        clearStressTest();
+        simState.running = true;
+        var startTime = null;
+        var duration = 2200;
+
+        var fill = byId(`stress-bar-fill`);
+        var sLabel = byId(`stress-status-label`);
+        var pctLabel = byId(`stress-pct-label`);
+
+        function step(timestamp) {
+          if (!startTime) startTime = timestamp;
+          var elapsed = timestamp - startTime;
+          var t = clamp(elapsed / duration, 0, 1);
+
+          simState.progress = t;
+          simState.loadMultiplier = t < 0.65 ? (t / 0.65) : 1;
+          simState.oscPhase = elapsed * 0.012;
+
+          var phys = computePhysics(simState.loadMultiplier);
+          var pct = Math.round(t * 100);
+
+          if (fill) fill.style.width = pct + `%`;
+          if (pctLabel) pctLabel.textContent = pct + `%`;
+          if (sLabel) {
+            sLabel.textContent = t < 0.65
+              ? `Applying Cable Load (` + Math.round(simState.loadMultiplier * 100) + `%)…`
+              : `Holding Full Load & Testing Structural Rigidity…`;
+          }
+
+          if (phys.failure) {
+            simState.failureType = phys.failure;
+            simState.running = false;
+            if (fill) fill.className = `stress-bar-fill is-fail`;
+            if (sLabel) sLabel.textContent = `Stress Test Failed — Structural Failure Detected`;
+            updateUI();
+            return;
+          }
+
+          updateUI();
+
+          if (t < 1) {
+            simState.animId = requestAnimationFrame(step);
+          } else {
+            simState.running = false;
+            simState.testPassed = true;
+            if (fill) fill.className = `stress-bar-fill is-pass`;
+            if (sLabel) sLabel.textContent = `Stress Test Complete — Pylon Held Full Load`;
+
+            if (CHALLENGES[appState.mode]) {
+              var allMet = evaluateChallengeCriteria(appState.mode).every(function (c) { return c.met; });
+              if (allMet) {
+                appState.passedChallenges[appState.mode] = true;
+                persistState();
+              }
+            }
+            updateUI();
+          }
+        }
+
+        simState.animId = requestAnimationFrame(step);
+      }
+
+      // Pointer & keyboard drag for SVG Ground Anchor
+      function setupSvgInteractions() {
+        var svg = byId(`pylon-svg`);
+        if (!svg) return;
+
+        function angleFromClientX(clientX) {
+          var rect = svg.getBoundingClientRect();
+          if (!rect.width) return appState.anchorAngle;
+          var svgX = ((clientX - rect.left) / rect.width) * 960;
+          var pylonX = getPylonX();
+          var dir = appState.anchorSide === `right` ? 1 : -1;
+          var attachX = pylonX + dir * 18;
+          var dx = (svgX - attachX) * dir;
+          dx = Math.max(dx, 35);
+          var rad = Math.atan2(ATTACH_H, dx);
+          var deg = Math.round((rad * 180) / Math.PI);
+          return clamp(deg, 15, 75);
+        }
+
+        svg.addEventListener(`pointerdown`, function (e) {
+          var handle = e.target.closest ? e.target.closest(`#svg-anchor-handle`) : null;
+          if (!handle || appState.anchorSide === `none`) return;
+          simState.draggingAnchor = true;
+          clearStressTest();
+          if (svg.setPointerCapture) {
+            try { svg.setPointerCapture(e.pointerId); } catch (err) {}
+          }
+          appState.anchorAngle = angleFromClientX(e.clientX);
+          updateUI();
+        });
+
+        svg.addEventListener(`pointermove`, function (e) {
+          if (!simState.draggingAnchor) return;
+          appState.anchorAngle = angleFromClientX(e.clientX);
+          updateUI();
+        });
+
+        function endDrag() {
+          if (!simState.draggingAnchor) return;
+          simState.draggingAnchor = false;
+          persistState();
+        }
+        svg.addEventListener(`pointerup`, endDrag);
+        svg.addEventListener(`pointercancel`, endDrag);
+
+        svg.addEventListener(`keydown`, function (e) {
+          if (!e.target || e.target.id !== `svg-anchor-handle`) return;
+          if (e.key !== `ArrowLeft` && e.key !== `ArrowRight`) return;
+          e.preventDefault();
+          clearStressTest();
+          var step = e.shiftKey ? 5 : 1;
+          var dir = appState.anchorSide === `right` ? 1 : -1;
+          var delta = (e.key === `ArrowRight` ? -dir : dir) * step;
+          appState.anchorAngle = clamp(appState.anchorAngle + delta, 15, 75);
+          updateUI();
+          persistState();
+        });
+      }
+
+      async function initApp() {
+        setupSvgInteractions();
+        try {
+          if (window.notebookAppApi && typeof window.notebookAppApi.getAppState === `function`) {
+            var saved = await window.notebookAppApi.getAppState();
+            if (saved && typeof saved === `object`) {
+              if (saved.mode) appState.mode = saved.mode;
+              if (saved.material) appState.material = saved.material;
+              if (typeof saved.triangulation === `boolean`) appState.triangulation = saved.triangulation;
+              if (typeof saved.crossBracing === `boolean`) appState.crossBracing = saved.crossBracing;
+              if (saved.anchorSide) appState.anchorSide = saved.anchorSide;
+              if (typeof saved.anchorAngle === `number`) appState.anchorAngle = clamp(saved.anchorAngle, 15, 75);
+              if (saved.spanMode) appState.spanMode = saved.spanMode;
+              if (typeof saved.loadLeft === `number`) appState.loadLeft = clamp(saved.loadLeft, 0, 100);
+              if (typeof saved.loadRight === `number`) appState.loadRight = clamp(saved.loadRight, 0, 100);
+              if (typeof saved.showVectors === `boolean`) appState.showVectors = saved.showVectors;
+              if (typeof saved.showLabels === `boolean`) appState.showLabels = saved.showLabels;
+              if (saved.passedChallenges && typeof saved.passedChallenges === `object`) {
+                appState.passedChallenges = {
+                  c1: !!saved.passedChallenges.c1,
+                  c2: !!saved.passedChallenges.c2,
+                  c3: !!saved.passedChallenges.c3
+                };
+              }
+            }
+          }
+        } catch (err) {
+          // Proceed with defaults
+        }
+
+        updateUI();
+
+        try {
+          if (window.notebookAppApi && typeof window.notebookAppApi.notifyAppReady === `function`) {
+            window.notebookAppApi.notifyAppReady();
+          }
+        } catch (err) {
+          // Safe outside host
+        }
+      }
+
+      if (document.readyState === `loading`) {
+        document.addEventListener(`DOMContentLoaded`, initApp);
+      } else {
+        initApp();
+      }
+  </script>
+</body>
+</html>
